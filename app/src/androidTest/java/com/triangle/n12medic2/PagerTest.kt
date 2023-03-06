@@ -6,10 +6,12 @@ import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import com.triangle.n12medic2.view.OnboardActivity
 import junit.framework.Assert.assertEquals
+import org.junit.Rule
 import org.junit.Test
 
 class PagerTest {
 
+    @get:Rule
     val pagerTestRule = createAndroidComposeRule<OnboardActivity>()
 
     // Изображение и текста из очереди извлекается правильно (в порядке добавления в очередь).
@@ -21,10 +23,10 @@ class PagerTest {
 
         pagerTestRule.onNodeWithText("Анализы").assertIsDisplayed()
 
-        pagerTestRule.onNodeWithTag("pagerTestTag").performTouchInput { swipeLeft() }
+        pagerTestRule.onNodeWithTag("pager").performTouchInput { swipeLeft() }
         pagerTestRule.onNodeWithText("Уведомления").assertIsDisplayed()
 
-        pagerTestRule.onNodeWithTag("pagerTestTag").performTouchInput { swipeLeft() }
+        pagerTestRule.onNodeWithTag("pager").performTouchInput { swipeLeft() }
         pagerTestRule.onNodeWithText("Мониторинг").assertIsDisplayed()
     }
 
@@ -38,10 +40,10 @@ class PagerTest {
 
         pagerTestRule.onNodeWithText("Анализы").assertIsDisplayed()
 
-        pagerTestRule.onNodeWithTag("pagerTestTag").performTouchInput { swipeLeft() }
+        pagerTestRule.onNodeWithTag("pager").performTouchInput { swipeLeft() }
         pagerTestRule.onNodeWithText("Уведомления").assertIsDisplayed()
 
-        pagerTestRule.onNodeWithTag("pagerTestTag").performTouchInput { swipeLeft() }
+        pagerTestRule.onNodeWithTag("pager").performTouchInput { swipeLeft() }
         pagerTestRule.onNodeWithText("Мониторинг").assertIsDisplayed()
     }
 
@@ -54,11 +56,11 @@ class PagerTest {
         }
 
         pagerTestRule.onNodeWithText("Пропустить").assertIsDisplayed()
-        pagerTestRule.onNodeWithTag("pagerTestTag").performTouchInput { swipeLeft() }
+        pagerTestRule.onNodeWithTag("pager").performTouchInput { swipeLeft() }
         pagerTestRule.onNodeWithText("Пропустить").assertIsDisplayed()
-        pagerTestRule.onNodeWithTag("pagerTestTag").performTouchInput { swipeLeft() }
+        pagerTestRule.onNodeWithTag("pager").performTouchInput { swipeLeft() }
         pagerTestRule.onNodeWithText("Завершить").assertIsDisplayed()
-        pagerTestRule.onNodeWithTag("pagerTestTag").performTouchInput { swipeRight() }
+        pagerTestRule.onNodeWithTag("pager").performTouchInput { swipeRight() }
         pagerTestRule.onNodeWithText("Пропустить").assertIsDisplayed()
     }
 
@@ -70,8 +72,8 @@ class PagerTest {
             pagerTestRule.activity.OnboardScreen()
         }
 
-        pagerTestRule.onNodeWithTag("pagerTestTag").performTouchInput { swipeLeft() }
-        pagerTestRule.onNodeWithTag("pagerTestTag").performTouchInput { swipeLeft() }
+        pagerTestRule.onNodeWithTag("pager").performTouchInput { swipeLeft() }
+        pagerTestRule.onNodeWithTag("pager").performTouchInput { swipeLeft() }
         pagerTestRule.onNodeWithText("Завершить").assertIsDisplayed()
     }
 
@@ -84,8 +86,8 @@ class PagerTest {
             pagerTestRule.activity.OnboardScreen()
         }
 
-        pagerTestRule.onNodeWithTag("pagerTestTag").performTouchInput { swipeLeft() }
-        pagerTestRule.onNodeWithTag("pagerTestTag").performTouchInput { swipeLeft() }
+        pagerTestRule.onNodeWithTag("pager").performTouchInput { swipeLeft() }
+        pagerTestRule.onNodeWithTag("pager").performTouchInput { swipeLeft() }
         pagerTestRule.onNodeWithText("Завершить").performClick()
 
         pagerTestRule.onNodeWithTag("authActivity").assertExists()
@@ -100,7 +102,7 @@ class PagerTest {
         }
 
         pagerTestRule.onNodeWithText("Пропустить").performClick()
-        val isCompleted = pagerTestRule.activity.getSharedPreferences("shared", Context.MODE_PRIVATE)
+        val isCompleted = pagerTestRule.activity.getSharedPreferences("shared", Context.MODE_PRIVATE).getBoolean("isOnboardCompleted", false)
         assertEquals(isCompleted, true)
     }
 }

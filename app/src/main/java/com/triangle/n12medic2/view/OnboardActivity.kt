@@ -58,19 +58,19 @@ class OnboardActivity : ComponentActivity() {
 
         val screen1 = mapOf(
             "title" to "Анализы.",
-            "description" to "Экспресс сбор и получение проб.",
+            "description" to "Экспресс сбор и получение проб",
             "image" to painterResource(id = R.drawable.onboard_1)
         )
 
         val screen2 = mapOf(
             "title" to "Уведомления.",
-            "description" to "Вы быстро узнаете о результатах.",
+            "description" to "Вы быстро узнаете о результатах",
             "image" to painterResource(id = R.drawable.onboard_2)
         )
 
         val screen3 = mapOf(
             "title" to "Мониторинг.",
-            "description" to "Наши врачи всегда наблюдают за вашими показателями здоровья.",
+            "description" to "Наши врачи всегда наблюдают за вашими показателями здоровья",
             "image" to painterResource(id = R.drawable.onboard_3)
         )
 
@@ -83,9 +83,9 @@ class OnboardActivity : ComponentActivity() {
         LaunchedEffect(pagerState) {
             snapshotFlow { pagerState.currentPage }.collect() {
                 skipButtonText = if (pagerState.currentPage == 2) {
-                    "Пропустить"
+                    "Завершить."
                 } else {
-                    "Завершить"
+                    "Пропустить."
                 }
             }
         }
