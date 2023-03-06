@@ -9,17 +9,14 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material.LocalTextStyle
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
-import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
@@ -28,7 +25,6 @@ import com.triangle.n12medic2.R
 import com.triangle.n12medic2.ui.components.AppTextButton
 import com.triangle.n12medic2.ui.components.OnboardComponent
 import com.triangle.n12medic2.ui.theme.N12medic2Theme
-import kotlinx.coroutines.flow.collect
 
 class OnboardActivity : ComponentActivity() {
     // Активити приветсвенных экранов (Onboard)
@@ -56,33 +52,33 @@ class OnboardActivity : ComponentActivity() {
         val mContext = LocalContext.current
         val pagerState = rememberPagerState()
 
-        val screen1 = mapOf(
+        val screenAnalyzes = mapOf(
             "title" to "Анализы",
             "description" to "Экспресс сбор и получение проб",
             "image" to painterResource(id = R.drawable.onboard_1)
         )
 
-        val screen2 = mapOf(
+        val screenNotifications = mapOf(
             "title" to "Уведомления",
             "description" to "Вы быстро узнаете о результатах",
             "image" to painterResource(id = R.drawable.onboard_2)
         )
 
-        val screen3 = mapOf(
+        val screenMonitoring = mapOf(
             "title" to "Мониторинг",
             "description" to "Наши врачи всегда наблюдают за вашими показателями здоровья",
             "image" to painterResource(id = R.drawable.onboard_3)
         )
 
         val screenList = listOf(
-            screen1, screen2, screen3
+            screenAnalyzes, screenNotifications, screenMonitoring
         )
 
-        var skipButtonText by rememberSaveable { mutableStateOf("Пропустить") }
+        var buttonSkipLabel by rememberSaveable { mutableStateOf("Пропустить") }
 
         LaunchedEffect(pagerState) {
             snapshotFlow { pagerState.currentPage }.collect() {
-                skipButtonText = if (pagerState.currentPage == 2) {
+                buttonSkipLabel = if (pagerState.currentPage == pagerState.pageCount - 1) {
                     "Завершить"
                 } else {
                     "Пропустить"
@@ -102,13 +98,13 @@ class OnboardActivity : ComponentActivity() {
                 AppTextButton(
                     modifier = Modifier
                         .padding(start = 30.dp),
-                    label = skipButtonText,
+                    label = buttonSkipLabel,
                     textStyle = LocalTextStyle.current.copy(fontWeight = FontWeight.SemiBold),
                     onClick = {
                         val authIntent = Intent(mContext, AuthActivity::class.java)
                         startActivity(authIntent)
 
-                        saveIsCompleted()
+                        saveCompleteTag()
                     }
                 )
                 Image(
@@ -134,7 +130,7 @@ class OnboardActivity : ComponentActivity() {
         }
     }
 
-    fun saveIsCompleted() {
+    private fun saveCompleteTag() {
         val sharedPreferences = this.getSharedPreferences("shared", MODE_PRIVATE)
 
         with(sharedPreferences.edit()) {
