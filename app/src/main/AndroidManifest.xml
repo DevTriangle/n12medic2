@@ -15,10 +15,31 @@
         android:theme="@style/Theme.N12medic2"
         tools:targetApi="31">
         <activity
+            android:name=".view.CreatePasswordActivity"
+            android:exported="false"
+            android:label="@string/title_activity_create_pasword"
+            android:theme="@style/Theme.N12medic2"
+            android:windowSoftInputMode="adjustResize">
+            <meta-data
+                android:name="android.app.lib_name"
+                android:value="" />
+        </activity>
+        <activity
+            android:name=".view.EmailCodeActivity"
+            android:exported="false"
+            android:label="@string/title_activity_email_code"
+            android:theme="@style/Theme.N12medic2"
+            android:windowSoftInputMode="adjustResize">
+            <meta-data
+                android:name="android.app.lib_name"
+                android:value="" />
+        </activity>
+        <activity
             android:name=".view.AuthActivity"
             android:exported="false"
             android:label="@string/title_activity_auth"
-            android:theme="@style/Theme.N12medic2">
+            android:theme="@style/Theme.N12medic2"
+            android:windowSoftInputMode="adjustResize">
             <meta-data
                 android:name="android.app.lib_name"
                 android:value="" />
@@ -27,7 +48,8 @@
             android:name=".view.OnboardActivity"
             android:exported="false"
             android:label="@string/title_activity_onboard"
-            android:theme="@style/Theme.N12medic2">
+            android:theme="@style/Theme.N12medic2"
+            android:windowSoftInputMode="adjustResize">
             <meta-data
                 android:name="android.app.lib_name"
                 android:value="" />
@@ -35,7 +57,8 @@
         <activity
             android:name=".view.SplashScreen"
             android:exported="true"
-            android:theme="@style/Theme.N12medic2">
+            android:theme="@style/Theme.N12medic2"
+            android:windowSoftInputMode="adjustResize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
