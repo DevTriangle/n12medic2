@@ -5,6 +5,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -169,6 +170,31 @@ fun AppIconButton(
                 .align(Alignment.Center)
                 .padding(4.dp),
             tint = descriptionColor
+        )
+    }
+}
+
+@Composable
+fun AppPasswordButton(
+    modifier: Modifier = Modifier,
+    label: String,
+    onClick: (String) -> Unit
+) {
+    Box(
+        modifier = modifier
+            .size(80.dp)
+            .clip(CircleShape)
+            .background(inputBG)
+            .clickable(
+                onClick = { onClick(label) }
+            )
+    ) {
+        Text(
+            modifier = Modifier
+                .align(Alignment.Center),
+            text = label,
+            fontSize = 24.sp,
+            fontWeight = FontWeight.SemiBold
         )
     }
 }

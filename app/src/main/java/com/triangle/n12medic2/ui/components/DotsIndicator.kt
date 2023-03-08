@@ -36,3 +36,28 @@ fun DotsIndicator(
         }
     }
 }
+
+// Компонент колличества введенных символов пароля
+@Composable
+fun PasswordDotsIndicator(
+    modifier: Modifier = Modifier,
+    count: Int = 4,
+    currentCount: Int
+) {
+    Row(
+        modifier = modifier,
+        horizontalArrangement = Arrangement.Center,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        for (i in 1..count) {
+            Box(
+                modifier = Modifier
+                    .padding(6.dp)
+                    .size(16.dp)
+                    .clip(CircleShape)
+                    .background(if (currentCount < i) Color.White else MaterialTheme.colors.primary)
+                    .border(1.dp, MaterialTheme.colors.primary, CircleShape)
+            )
+        }
+    }
+}

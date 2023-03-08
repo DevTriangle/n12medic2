@@ -28,6 +28,7 @@ class EmailCodeViewModel:ViewModel() {
                 val json = apiService.signIn(headers)
 
                 if (json.code() == 200) {
+
                     token.value = json.body()?.get("token").toString()
                 } else {
                     errorMessage.value = json.body()?.get("errors").toString()

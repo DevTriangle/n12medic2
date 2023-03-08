@@ -15,6 +15,16 @@
         android:theme="@style/Theme.N12medic2"
         tools:targetApi="31">
         <activity
+            android:name=".view.ManageCardActivity"
+            android:exported="false"
+            android:label="@string/title_activity_manage_card_view_model"
+            android:theme="@style/Theme.N12medic2"
+            android:windowSoftInputMode="adjustResize">
+            <meta-data
+                android:name="android.app.lib_name"
+                android:value="" />
+        </activity>
+        <activity
             android:name=".view.CreatePasswordActivity"
             android:exported="false"
             android:label="@string/title_activity_create_pasword"
