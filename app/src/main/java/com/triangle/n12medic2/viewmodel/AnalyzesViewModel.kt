@@ -17,6 +17,8 @@ import kotlinx.coroutines.launch
 // Автор: Triangle
 class AnalyzesViewModel: ViewModel() {
     var message = MutableLiveData<String>()
+    var isSuccessLoadNews = MutableLiveData<Boolean>()
+    var isSuccessLoadCatalog = MutableLiveData<Boolean>()
 
     private var _news:MutableList<News> = mutableStateListOf()
     var news: List<News> by mutableStateOf(_news)
@@ -46,6 +48,7 @@ class AnalyzesViewModel: ViewModel() {
     fun loadNews() {
         _news.clear()
         message.value = null
+        isSuccessLoadNews.value = null
 
         val apiService = ApiService.getInstance()
 
@@ -55,13 +58,13 @@ class AnalyzesViewModel: ViewModel() {
 
                 if (json.code() == 200) {
                     _news.addAll(json.body()!!)
-                    Log.d(TAG, "loadNews: ${news.size}")
+                    isSuccessLoadNews.value = true
                 } else {
-                    Log.d(TAG, "loadNews: ${json.message()}")
+                    isSuccessLoadCatalog.value = false
                     message.value = "Ошибка 422"
                 }
             } catch (e: Exception) {
-                Log.d(TAG, "loadNews: ${e.message}")
+                isSuccessLoadCatalog.value = false
                 message.value = e.message
             }
         }
@@ -73,6 +76,7 @@ class AnalyzesViewModel: ViewModel() {
     fun loadCatalog() {
         _analysis.clear()
         message.value = null
+        isSuccessLoadCatalog.value = null
 
         val apiService = ApiService.getInstance()
 
@@ -82,13 +86,13 @@ class AnalyzesViewModel: ViewModel() {
 
                 if (json.code() == 200) {
                     _analysis.addAll(json.body()!!)
-                    Log.d(TAG, "loadCatalog: ${analysis.size}")
+                    isSuccessLoadCatalog.value = true
                 } else {
-                    Log.d(TAG, "loadCatalog: ${json.message()}")
+                    isSuccessLoadCatalog.value = false
                     message.value = "Ошибка 422"
                 }
             } catch (e: Exception) {
-                Log.d(TAG, "loadCatalog: ${e.message}")
+                isSuccessLoadCatalog.value = false
                 message.value = e.message
             }
         }

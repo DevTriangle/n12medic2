@@ -22,6 +22,9 @@ import com.triangle.n12medic2.ui.theme.N12medic2Theme
 import com.triangle.n12medic2.R
 import com.triangle.n12medic2.ui.theme.iconsColor
 import com.triangle.n12medic2.view.screens.AnalyzesScreen
+import com.triangle.n12medic2.view.screens.ProfileScreen
+import com.triangle.n12medic2.view.screens.ResultsScreen
+import com.triangle.n12medic2.view.screens.SupportScreen
 import com.triangle.n12medic2.viewmodel.AnalyzesViewModel
 
 class HomeActivity : ComponentActivity() {
@@ -116,6 +119,9 @@ class HomeActivity : ComponentActivity() {
         }
     }
 
+    // Навигация через нижнее меню
+    // Дата создания: 09.03.2023 08:48
+    // Автор: Triangle
     @Composable
     fun Navigation(navHostController: NavHostController) {
         val analyzesViewModel = ViewModelProvider(this)[AnalyzesViewModel::class.java]
@@ -128,13 +134,13 @@ class HomeActivity : ComponentActivity() {
                 AnalyzesScreen(analyzesViewModel)
             }
             composable("results") {
-
+                ResultsScreen()
             }
             composable("support") {
-
+                SupportScreen()
             }
             composable("profile") {
-
+                ProfileScreen()
             }
         }
     }

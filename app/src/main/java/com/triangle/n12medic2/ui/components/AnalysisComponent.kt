@@ -26,17 +26,18 @@ fun AnalysisComponent(
 ) {
     Box(
         modifier = Modifier
+            .shadow(10.dp, MaterialTheme.shapes.medium, spotColor = Color.Black.copy(0.2f))
             .clip(MaterialTheme.shapes.medium)
             .clickable(
                 onClick = onClick
             )
-            .shadow(10.dp, MaterialTheme.shapes.medium, spotColor = Color.Black.copy(0.2f))
             .background(Color.White),
     ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(340.dp),
+                .padding(16.dp)
+                .height(150.dp),
             verticalArrangement = Arrangement.SpaceBetween
         ) {
             Text(
@@ -64,7 +65,9 @@ fun AnalysisComponent(
                 }
                 AppButton(
                     label = "Добавить",
-                    onClick = onClick
+                    onClick = onClick,
+                    contentPadding = PaddingValues(16.dp, 10.dp),
+                    fontSize = 14.sp
                 )
             }
         }
