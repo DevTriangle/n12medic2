@@ -1,16 +1,14 @@
 package com.triangle.n12medic2.common
 
 import com.google.gson.JsonObject
+import com.triangle.n12medic2.model.Analysis
+import com.triangle.n12medic2.model.News
 import com.triangle.n12medic2.model.User
 import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.create
-import retrofit2.http.Body
-import retrofit2.http.Header
-import retrofit2.http.HeaderMap
-import retrofit2.http.Headers
-import retrofit2.http.POST
+import retrofit2.http.*
 
 interface ApiService {
 
@@ -32,6 +30,18 @@ interface ApiService {
     )
     @POST("createProfile")
     suspend fun createProfile(@Header("Authorization") token: String, @Body user: User): Response<JsonObject>
+
+    @Headers(
+        "accept: application/json",
+    )
+    @GET("news")
+    suspend fun loadNews(): Response<MutableList<News>>
+
+    @Headers(
+        "accept: application/json",
+    )
+    @GET("catalog")
+    suspend fun loadCatalog(): Response<MutableList<Analysis>>
 
     companion object {
         var apiService: ApiService? = null

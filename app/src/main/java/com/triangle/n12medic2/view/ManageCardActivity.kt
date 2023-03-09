@@ -113,7 +113,8 @@ class ManageCardActivity : ComponentActivity() {
                             backgroundColor = Color.Transparent
                         ),
                         onClick = {
-
+                            val homeIntent = Intent(mContext, HomeActivity::class.java)
+                            startActivity(homeIntent)
                         }
                     )
                 }

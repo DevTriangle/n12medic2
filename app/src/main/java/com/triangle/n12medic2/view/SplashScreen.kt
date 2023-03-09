@@ -50,15 +50,13 @@ class SplashScreen : ComponentActivity() {
             }
 
             coroutineScope.launch {
-                delay(2000)
-
                 if (isOnboardCompleted) {
                     if (token != "") {
                         if (isPasswordSkipped) {
                             val authIntent = Intent(mContext, CreatePasswordActivity::class.java)
                             startActivity(authIntent)
                         } else {
-                            val authIntent = Intent(mContext, ManageCardActivity::class.java) //todo
+                            val authIntent = Intent(mContext, HomeActivity::class.java) //todo
                             startActivity(authIntent)
                         }
                     } else {

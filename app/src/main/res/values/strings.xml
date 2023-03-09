@@ -5,4 +5,5 @@
     <string name="title_activity_email_code">EmailCodeActivity</string>
     <string name="title_activity_create_pasword">CreatePaswordActivity</string>
     <string name="title_activity_manage_card_view_model">ManageCardViewModel</string>
+    <string name="title_activity_home">HomeActivity</string>
 </resources>
