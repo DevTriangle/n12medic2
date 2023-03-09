@@ -6,10 +6,16 @@ import androidx.lifecycle.viewModelScope
 import com.triangle.n12medic2.common.ApiService
 import kotlinx.coroutines.launch
 
+// ViewModel для авторизации пользователя
+// Дата создания: 09.03.2023 09:44
+// Автор: Triangle
 class EmailCodeViewModel:ViewModel() {
     var errorMessage = MutableLiveData<String>()
     var token = MutableLiveData<String>()
 
+    // Авторизация пользователя
+    // Дата создания: 09.03.2023 09:44
+    // Автор: Triangle
     fun signIn(
         email: String,
         code: String

@@ -10,6 +10,9 @@ import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.create
 import retrofit2.http.*
 
+// Интерфейс для обращения к серверу через API
+// Дата создания: 09.03.2023 09:44
+// Автор: Triangle
 interface ApiService {
 
     @Headers(

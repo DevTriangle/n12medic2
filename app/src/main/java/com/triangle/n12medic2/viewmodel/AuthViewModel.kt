@@ -6,10 +6,16 @@ import androidx.lifecycle.viewModelScope
 import com.triangle.n12medic2.common.ApiService
 import kotlinx.coroutines.launch
 
+// ViewModel для отправки кода на почту
+// Дата создания: 09.03.2023 09:44
+// Автор: Triangle
 class AuthViewModel: ViewModel() {
     var message = MutableLiveData<String>()
     var isSuccess = MutableLiveData<Boolean>()
 
+    // Отправка кода на почту
+    // Дата создания: 09.03.2023 09:44
+    // Автор: Triangle
     fun sendCode(email: String) {
         message.value = null
         isSuccess.value = null

@@ -15,6 +15,9 @@ import com.triangle.n12medic2.ui.theme.descriptionColor
 import com.triangle.n12medic2.ui.theme.inputBG
 import java.util.Locale.Category
 
+// Карточка с названием категории анализов
+// Дата создания: 09.03.2023 09:44
+// Автор: Triangle
 @Composable
 fun CategoryChip(
     modifier: Modifier = Modifier,

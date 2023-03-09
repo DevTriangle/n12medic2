@@ -9,10 +9,16 @@ import com.triangle.n12medic2.common.ApiService
 import com.triangle.n12medic2.model.User
 import kotlinx.coroutines.launch
 
+// ViewModel для отпрвки данных карты на сервер
+// Дата создания: 09.03.2023 09:44
+// Автор: Triangle
 class ManageCardViewModel:ViewModel() {
     var errorMessage = MutableLiveData<String>()
     var isSuccess = MutableLiveData<Boolean>()
 
+    // Создание профиля пользователя
+    // Дата создания: 09.03.2023 09:44
+    // Автор: Triangle
     fun createProfile(
         firstName: String,
         patronymic: String,

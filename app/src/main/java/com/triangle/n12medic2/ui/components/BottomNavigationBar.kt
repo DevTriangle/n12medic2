@@ -14,7 +14,6 @@ import com.triangle.n12medic2.ui.theme.iconsColor
 // Компонент нижнего меню навигации
 // Дата создания: 09.03.2023 08:51
 // Автор: Triangle
-
 @Composable
 fun BottomNavigationBar(
     modifier: Modifier = Modifier,
