@@ -8,10 +8,10 @@ import com.google.gson.annotations.SerializedName
 // Автор: Triangle
 @Keep
 data class User(
-    @SerializedName("firstname") val firstName: String,
-    @SerializedName("lastname") val lastname: String,
-    @SerializedName("middlename") val patronymic: String,
-    @SerializedName("bith") val birthday: String,
-    @SerializedName("pol") val gender: String,
-    @SerializedName("image") val image: String,
+    @SerializedName("firstname") var firstName: String,
+    @SerializedName("lastname") var lastname: String,
+    @SerializedName("middlename") var patronymic: String,
+    @SerializedName("bith") var birthday: String,
+    @SerializedName("pol") var gender: String,
+    @SerializedName("image") var image: String,
 )

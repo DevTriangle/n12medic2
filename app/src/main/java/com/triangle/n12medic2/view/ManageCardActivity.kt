@@ -26,6 +26,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.ViewModelProvider
 import com.triangle.n12medic2.R
+import com.triangle.n12medic2.common.UserService
+import com.triangle.n12medic2.model.User
 import com.triangle.n12medic2.ui.components.AppButton
 import com.triangle.n12medic2.ui.components.AppTextButton
 import com.triangle.n12medic2.ui.components.AppTextField
@@ -73,6 +75,8 @@ class ManageCardActivity : ComponentActivity() {
         var isExpanded by rememberSaveable { mutableStateOf(false) }
         var isLoading by rememberSaveable { mutableStateOf(false) }
         var isErrorVisible by rememberSaveable { mutableStateOf(false) }
+
+        val userList: MutableList<User> = remember { mutableStateListOf() }
 
         val isSuccess by viewModel.isSuccess.observeAsState()
         LaunchedEffect(isSuccess) {
@@ -273,6 +277,9 @@ class ManageCardActivity : ComponentActivity() {
                             Log.d(TAG, "ManageCardScreen: $token")
                             viewModel.createProfile(firstName, patronymic, lastName, birthday, gender, token!!)
                             isLoading = true
+
+                            userList.add(0, User(firstName, lastName, patronymic, birthday, gender, ""))
+                            UserService().savePatients(sharedPreferences, userList)
                         }
                     )
                 }

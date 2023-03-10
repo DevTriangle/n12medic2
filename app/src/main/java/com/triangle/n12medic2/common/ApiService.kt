@@ -36,6 +36,13 @@ interface ApiService {
 
     @Headers(
         "accept: application/json",
+        "Content-Type: application/json"
+    )
+    @PUT("updateProfile")
+    suspend fun updateProfile(@Header("Authorization") token: String, @Body userData: Map<String, String>): Response<JsonObject>
+
+    @Headers(
+        "accept: application/json",
     )
     @GET("news")
     suspend fun loadNews(): Response<MutableList<News>>

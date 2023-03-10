@@ -1,8 +1,11 @@
 package com.triangle.n12medic2.view
 
+import android.graphics.Bitmap
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.result.ActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -26,6 +29,7 @@ import com.triangle.n12medic2.view.screens.ProfileScreen
 import com.triangle.n12medic2.view.screens.ResultsScreen
 import com.triangle.n12medic2.view.screens.SupportScreen
 import com.triangle.n12medic2.viewmodel.AnalyzesViewModel
+import com.triangle.n12medic2.viewmodel.ManageCardViewModel
 
 class HomeActivity : ComponentActivity() {
     // Активити главного экрана с навигацией через нижнее меню
@@ -125,6 +129,7 @@ class HomeActivity : ComponentActivity() {
     @Composable
     fun Navigation(navHostController: NavHostController) {
         val analyzesViewModel = ViewModelProvider(this)[AnalyzesViewModel::class.java]
+        val manageCardViewModel = ViewModelProvider(this)[ManageCardViewModel::class.java]
 
         NavHost(
             navController = navHostController,
@@ -140,7 +145,29 @@ class HomeActivity : ComponentActivity() {
                 SupportScreen()
             }
             composable("profile") {
-                ProfileScreen()
+                ProfileScreen(manageCardViewModel, navHostController, photoResultLauncher, videoResultLauncher)
+            }
+        }
+    }
+
+    val photoResultLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        val manageCardViewModel = ViewModelProvider(this)[ManageCardViewModel::class.java]
+
+        if (result.resultCode == RESULT_OK) {
+            val data = result.data
+            if (data != null) {
+                manageCardViewModel.setImage(data.extras?.get("data") as Bitmap)
+            }
+        }
+    }
+
+    val videoResultLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        val manageCardViewModel = ViewModelProvider(this)[ManageCardViewModel::class.java]
+
+        if (result.resultCode == RESULT_OK) {
+            val data = result.data
+            if (data != null) {
+                manageCardViewModel.setVideo(data.data!!)
             }
         }
     }

@@ -44,5 +44,7 @@ class UserService {
         val pList = patients
 
         patients.add(0, patient)
+
+        savePatients(sharedPreferences, pList)
     }
 }
