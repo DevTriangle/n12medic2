@@ -10,9 +10,17 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.DefaultStrokeLineMiter
+import androidx.compose.ui.graphics.vector.DefaultStrokeLineWidth
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.triangle.n12medic2.model.Analysis
@@ -87,6 +95,71 @@ fun AnalysisComponent(
                         border = BorderStroke(1.dp, MaterialTheme.colors.primary)
                     )
                 }
+            }
+        }
+    }
+}
+
+// Компонент анализа в поиске
+// Дата создания: 10.03.2023 11:51
+// Автор: Triangle
+@Composable
+fun AnalysisSearchComponent(
+    analysis: Analysis,
+    onClick: (Analysis) -> Unit,
+    searchValue: String
+) {
+    val sText = analysis.name.split(searchValue)
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { onClick(analysis) }
+            .drawBehind {
+                drawLine(
+                    Color(0xFFF4F4F4),
+                    Offset(0f, size.height),
+                    Offset(size.width, size.height),
+                    DefaultStrokeLineMiter
+                )
+            }
+            .padding(vertical = 12.dp)
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Text(
+                modifier = Modifier
+                    .fillMaxWidth(0.6f),
+                text = buildAnnotatedString {
+                    for ((i, t) in sText.withIndex()) {
+                        append(t)
+                        if (i != sText.size - 1) {
+                            withStyle(style = SpanStyle(color = MaterialTheme.colors.primary)) {
+                                append(searchValue)
+                            }
+                        }
+                    }
+                },
+                fontSize = 15.sp
+            )
+            Column() {
+                Text(
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    text = "${analysis.price} ₽",
+                    textAlign = TextAlign.End,
+                    fontSize = 17.sp
+                    )
+                Text(
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    text = analysis.time_result,
+                    textAlign = TextAlign.End,
+                    fontSize = 14.sp,
+                    color = captionColor
+                )
             }
         }
     }

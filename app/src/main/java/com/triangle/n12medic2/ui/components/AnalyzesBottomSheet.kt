@@ -1,7 +1,9 @@
 package com.triangle.n12medic2.ui.components
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -24,6 +26,7 @@ fun AnalyzesBottomSheet(
         modifier = Modifier
             .fillMaxWidth()
             .padding(20.dp, 24.dp)
+            .verticalScroll(rememberScrollState())
     ) {
         Column(
             modifier = Modifier
@@ -78,7 +81,7 @@ fun AnalyzesBottomSheet(
                 .fillMaxWidth()
         ) {
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                Column() {
+                Column(modifier = Modifier.fillMaxWidth(0.5f)) {
                     Text(
                         text = "Результаты через:",
                         fontWeight = FontWeight.SemiBold,
@@ -91,7 +94,7 @@ fun AnalyzesBottomSheet(
                         fontSize = 16.sp,
                     )
                 }
-                Column() {
+                Column(modifier = Modifier.fillMaxWidth(1f)) {
                     Text(
                         text = "Биоматериал:",
                         fontWeight = FontWeight.SemiBold,
