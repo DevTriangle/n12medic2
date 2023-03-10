@@ -1,42 +1,57 @@
 package com.triangle.n12medic2.view.screens
 
+import android.content.ContentValues.TAG
+import android.content.Context
+import android.content.Intent
+import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.AlertDialog
-import androidx.compose.material.Icon
-import androidx.compose.material.Text
+import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.ViewModel
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
+import com.triangle.n12medic2.view.CartActivity
 import com.triangle.n12medic2.R
+import com.triangle.n12medic2.common.CartService
+import com.triangle.n12medic2.model.Analysis
+import com.triangle.n12medic2.model.CartItem
 import com.triangle.n12medic2.ui.components.*
 import com.triangle.n12medic2.ui.theme.captionColor
 import com.triangle.n12medic2.ui.theme.descriptionColor
 import com.triangle.n12medic2.viewmodel.AnalyzesViewModel
-import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.launch
 
 // Экран Анализы/Главная
 // Дата создания: 09.03.2023 09:05
 // Автор: Triangle
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun AnalyzesScreen(
     viewModel: AnalyzesViewModel
 ) {
+    val mContext = LocalContext.current
+    val scope = rememberCoroutineScope()
     val lazyListState = rememberLazyListState()
+    val sheetState = rememberModalBottomSheetState(initialValue = ModalBottomSheetValue.Hidden, skipHalfExpanded = true)
+    val sharedPreferences = mContext.getSharedPreferences("shared", Context.MODE_PRIVATE)
 
     var searchValue by rememberSaveable { mutableStateOf("") }
     var isNewsVisible by rememberSaveable { mutableStateOf(true) }
@@ -52,7 +67,13 @@ fun AnalyzesScreen(
     }
 
     var selectedCategory by rememberSaveable { mutableStateOf("Популярные") }
+    var selectedAnalysis by remember { mutableStateOf(Analysis(0,"", "", "", "", "", "", "")) }
 
+    val cart: MutableList<CartItem> = remember { mutableStateListOf() }
+    LaunchedEffect(Unit) {
+        cart.addAll(CartService().loadCart(sharedPreferences))
+    }
+    
     LaunchedEffect(Unit) {
         viewModel.loadNews()
         viewModel.loadCatalog()
@@ -80,89 +101,166 @@ fun AnalyzesScreen(
 
     val swipeRefreshState = rememberSwipeRefreshState(isRefreshing = isLoading)
 
-    SwipeRefresh(
-        state = swipeRefreshState,
-        onRefresh = {
-            viewModel.loadNews()
-            viewModel.loadCatalog()
-        }
+    ModalBottomSheetLayout(
+        sheetContent = {
+            var isInCart = false
+            for (item in cart) {
+                if (item.id == selectedAnalysis.id) {
+                    isInCart = true
+                    break
+                }
+            }
+            AnalyzesBottomSheet(
+                analysis = selectedAnalysis,
+                onDismiss = {
+                    scope.launch {
+                        sheetState.hide()
+                    }
+                },
+                onAddClick = { analysis ->
+                    if (isInCart) {
+                        val index = cart.indexOfFirst { it.id == analysis.id }
+
+                        cart.removeAt(index)
+                    } else {
+                        cart.add(CartItem(analysis.id, analysis.name, analysis.price, 1))
+                    }
+                    CartService().saveCart(sharedPreferences, cart)
+                },
+                isInCart = isInCart
+            )
+        },
+        sheetState = sheetState,
+        sheetShape = MaterialTheme.shapes.large.copy(bottomStart = CornerSize(0.dp), bottomEnd = CornerSize(0.dp))
     ) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(horizontal = 20.dp)
+        SwipeRefresh(
+            state = swipeRefreshState,
+            onRefresh = {
+                viewModel.loadNews()
+                viewModel.loadCatalog()
+            }
         ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 24.dp)
-            ) {
-                AppTextField(
+            Box() {
+                Column(
                     modifier = Modifier
-                        .fillMaxWidth(),
-                    value = searchValue,
-                    onValueChange = { searchValue = it },
-                    placeholder = {
-                        Text(
-                            text = "Искать анализы",
-                            fontSize = 16.sp,
-                            color = captionColor
-                        )
-                    },
-                    leadingIcon = {
-                        Icon(
-                            painter = painterResource(id = R.drawable.ic_search),
-                            contentDescription = "",
-                            tint = descriptionColor
+                        .fillMaxSize()
+                        .padding(horizontal = 20.dp)
+                ) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 24.dp)
+                    ) {
+                        AppTextField(
+                            modifier = Modifier
+                                .fillMaxWidth(),
+                            value = searchValue,
+                            onValueChange = { searchValue = it },
+                            placeholder = {
+                                Text(
+                                    text = "Искать анализы",
+                                    fontSize = 16.sp,
+                                    color = captionColor
+                                )
+                            },
+                            leadingIcon = {
+                                Icon(
+                                    painter = painterResource(id = R.drawable.ic_search),
+                                    contentDescription = "",
+                                    tint = descriptionColor
+                                )
+                            }
                         )
                     }
-                )
-            }
-            Spacer(modifier = Modifier.height(10.dp))
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-            ) {
-                AnimatedVisibility(visible = isNewsVisible) {
-                    Column(modifier = Modifier.fillMaxWidth().verticalScroll(rememberScrollState())) {
-                        BlockTitle(title = "Акции и новости")
+                    Spacer(modifier = Modifier.height(10.dp))
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                    ) {
+                        AnimatedVisibility(visible = isNewsVisible) {
+                            Column(modifier = Modifier
+                                .fillMaxWidth()
+                                .verticalScroll(rememberScrollState())) {
+                                BlockTitle(title = "Акции и новости")
+                                Spacer(modifier = Modifier.height(16.dp))
+                                LazyRow() {
+                                    items(viewModel.news.distinct()) { news ->
+                                        NewsComponent(news = news)
+                                    }
+                                }
+                            }
+                            Spacer(modifier = Modifier.height(16.dp))
+                        }
+                        Spacer(modifier = Modifier.height(16.dp))
+                        BlockTitle(title = "Каталог анализов")
                         Spacer(modifier = Modifier.height(16.dp))
                         LazyRow() {
-                            items(viewModel.news.distinct()) { news ->
-                                NewsComponent(news = news)
+                            items(viewModel.categories) { cat ->
+                                CategoryChip(
+                                    name = cat,
+                                    selected = selectedCategory == cat,
+                                    onClick = { selectedCategory = it }
+                                )
+                                Spacer(modifier = Modifier.width(16.dp))
+                            }
+                        }
+                        Spacer(modifier = Modifier.height(6.dp))
+                        LazyColumn(
+                            state = lazyListState
+                        ) {
+                            item {
+                                Spacer(modifier = Modifier.height(18.dp))
+                            }
+                            items(viewModel.analysis.filter { it.category.lowercase() == selectedCategory.lowercase() }.distinct()) { analysis ->
+                                var isInCart = false
+                                for (item in cart) {
+                                    if (item.id == analysis.id) {
+                                        isInCart = true
+                                        break
+                                    }
+                                }
+
+                                AnalysisComponent(
+                                    analysis = analysis,
+                                    onClick = {
+                                        selectedAnalysis = analysis
+                                        scope.launch {
+                                            sheetState.show()
+                                        }
+                                    },
+                                    onAddClick = {
+                                        if (isInCart) {
+                                            val index = cart.indexOfFirst { it.id == analysis.id }
+
+                                            cart.removeAt(index)
+                                        } else {
+                                            cart.add(CartItem(analysis.id, analysis.name, analysis.price, 1))
+                                        }
+
+                                        CartService().saveCart(sharedPreferences, cart)
+                                    },
+                                    isInCart = isInCart
+                                )
+                                Spacer(modifier = Modifier.height(16.dp))
                             }
                         }
                     }
-                    Spacer(modifier = Modifier.height(16.dp))
                 }
-                Spacer(modifier = Modifier.height(16.dp))
-                BlockTitle(title = "Каталог анализов")
-                Spacer(modifier = Modifier.height(16.dp))
-                LazyRow() {
-                    items(viewModel.categories) { cat ->
-                        CategoryChip(
-                            name = cat,
-                            selected = selectedCategory == cat,
-                            onClick = { selectedCategory = it }
-                        )
-                        Spacer(modifier = Modifier.width(16.dp))
-                    }
-                }
-                Spacer(modifier = Modifier.height(6.dp))
-                LazyColumn(
-                    state = lazyListState
-                ) {
-                    item {
-                        Spacer(modifier = Modifier.height(18.dp))
-                    }
-                    items(viewModel.analysis.filter { it.category.lowercase() == selectedCategory.lowercase() }.distinct()) { analysis ->
-                        AnalysisComponent(
-                            analysis = analysis,
+                if (cart.isNotEmpty()) {
+                    Box(
+                        modifier = Modifier
+                            .background(Color.White)
+                            .padding(20.dp, 24.dp)
+                            .align(Alignment.BottomCenter)
+                    ) {
+                        Log.d(TAG, "AnalyzesScreen: ${cart.size}")
+                        AppCartButton(
+                            cart = cart,
                             onClick = {
-
+                                val intent = Intent(mContext, CartActivity::class.java)
+                                mContext.startActivity(intent)
                             }
                         )
-                        Spacer(modifier = Modifier.height(16.dp))
                     }
                 }
             }

@@ -1,5 +1,6 @@
 package com.triangle.n12medic2.ui.components
 
+import android.webkit.WebSettings.PluginState
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -16,13 +17,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Paint
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.*
-import com.triangle.n12medic2.ui.theme.descriptionColor
-import com.triangle.n12medic2.ui.theme.inputBG
-import com.triangle.n12medic2.ui.theme.inputStroke
-import com.triangle.n12medic2.ui.theme.primaryInactiveColor
+import com.triangle.n12medic2.R
+import com.triangle.n12medic2.model.CartItem
+import com.triangle.n12medic2.ui.theme.*
 
 // Текстовая кнопка
 @Composable
@@ -78,7 +79,8 @@ fun AppButton(
     ),
     contentPadding: PaddingValues = PaddingValues(16.dp),
     fontSize: TextUnit = 17.sp,
-    isLoading: Boolean = false
+    isLoading: Boolean = false,
+    icon: Painter? = null
 ) {
     Button(
         modifier = modifier,
@@ -91,19 +93,29 @@ fun AppButton(
         colors = colors,
         contentPadding = contentPadding,
     ) {
-        if (isLoading) {
-            CircularProgressIndicator(
-                modifier = Modifier
-                    .size(17.dp),
-                color = Color.White,
-                strokeWidth = 1.dp
-            )
-        } else {
-            Text(
-                text = label,
-                fontWeight = FontWeight.SemiBold,
-                fontSize = fontSize
-            )
+        Row() {
+            if (isLoading) {
+                CircularProgressIndicator(
+                    modifier = Modifier
+                        .size(17.dp),
+                    color = Color.White,
+                    strokeWidth = 1.dp
+                )
+            } else {
+                if (icon != null) {
+                    Icon(
+                        painter = icon,
+                        contentDescription = "",
+                        tint = Color.White,
+
+                    )
+                }
+                Text(
+                    text = label,
+                    fontWeight = FontWeight.SemiBold,
+                    fontSize = fontSize
+                )
+            }
         }
     }
 }
@@ -168,7 +180,7 @@ fun AppIconButton(
             contentDescription = "",
             modifier = Modifier
                 .align(Alignment.Center)
-                .padding(4.dp),
+                .padding(3.dp),
             tint = descriptionColor
         )
     }
@@ -196,5 +208,99 @@ fun AppPasswordButton(
             fontSize = 24.sp,
             fontWeight = FontWeight.SemiBold
         )
+    }
+}
+
+// Кнопка корзины на главном экране
+// Дата создания: 10.03.2023 09:24
+// Автор: Triangle
+@Composable
+fun AppCartButton(
+    cart: MutableList<CartItem>,
+    onClick: () -> Unit
+) {
+    var sum = 0
+
+    for (item in cart) {
+        sum += item.price.toInt()
+    }
+
+    Button(
+        modifier = Modifier
+            .fillMaxWidth(),
+        onClick = onClick,
+        colors = ButtonDefaults.buttonColors(
+            backgroundColor = MaterialTheme.colors.primary,
+            contentColor = Color.White
+        ),
+        elevation = ButtonDefaults.elevation(0.dp, 0.dp, 0.dp, 0.dp, 0.dp),
+        contentPadding = PaddingValues(16.dp)
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Row {
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_cart),
+                    contentDescription = "",
+                    tint = Color.White,
+                )
+                Spacer(modifier = Modifier.width(16.dp))
+                Text(
+                    text = "В корзину",
+                    fontWeight = FontWeight.SemiBold,
+                    fontSize = 17.sp
+                )
+            }
+            Text(
+                text = "$sum ₽",
+                fontWeight = FontWeight.SemiBold,
+                fontSize = 17.sp
+            )
+        }
+    }
+}
+
+@Composable
+fun CartButtons(
+    modifier: Modifier = Modifier,
+    onPlusClick: () -> Unit,
+    onMinusClick: () -> Unit,
+    minusEnabled: Boolean,
+    plusEnabled: Boolean
+) {
+    Card(
+        modifier = modifier
+            .height(38.dp),
+        elevation = 0.dp,
+        backgroundColor = inputBG
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            IconButton(onClick = onMinusClick, enabled = minusEnabled) {
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_minus),
+                    contentDescription = "",
+                    tint = if (minusEnabled) captionColor else iconsColor
+                )
+            }
+            Spacer(
+                modifier = Modifier
+                    .width(1.dp)
+                    .height(25.dp)
+                    .background(inputStroke)
+            )
+            IconButton(onClick = onPlusClick) {
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_plus),
+                    contentDescription = "",
+                    tint = if (plusEnabled) captionColor else iconsColor
+                )
+            }
+        }
     }
 }

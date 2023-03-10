@@ -1,8 +1,10 @@
 package com.triangle.n12medic2.ui.components
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -22,7 +24,9 @@ import com.triangle.n12medic2.ui.theme.captionColor
 @Composable
 fun AnalysisComponent(
     analysis: Analysis,
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    isInCart: Boolean,
+    onAddClick: () -> Unit
 ) {
     Box(
         modifier = Modifier
@@ -63,12 +67,26 @@ fun AnalysisComponent(
                         fontWeight = FontWeight.SemiBold
                     )
                 }
-                AppButton(
-                    label = "Добавить",
-                    onClick = onClick,
-                    contentPadding = PaddingValues(16.dp, 10.dp),
-                    fontSize = 14.sp
-                )
+                if (!isInCart) {
+                    AppButton(
+                        label = "Добавить",
+                        onClick = onAddClick,
+                        contentPadding = PaddingValues(16.dp, 10.dp),
+                        fontSize = 14.sp
+                    )
+                } else {
+                    AppButton(
+                        label = "Убрать",
+                        onClick = onAddClick,
+                        contentPadding = PaddingValues(16.dp, 10.dp),
+                        fontSize = 14.sp,
+                        colors = ButtonDefaults.buttonColors(
+                            backgroundColor = Color.White,
+                            contentColor = MaterialTheme.colors.primary
+                        ),
+                        border = BorderStroke(1.dp, MaterialTheme.colors.primary)
+                    )
+                }
             }
         }
     }

@@ -8,6 +8,7 @@ import com.google.gson.annotations.SerializedName
 // Автор: Triangle
 @Keep
 data class Analysis(
+    @SerializedName("id") val id: Int,
     @SerializedName("name") val name: String,
     @SerializedName("description") val description: String,
     @SerializedName("price") val price: String,
