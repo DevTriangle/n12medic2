@@ -47,6 +47,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.ViewModelProvider
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import com.triangle.n12medic2.view.CartActivity
@@ -59,6 +60,7 @@ import com.triangle.n12medic2.model.User
 import com.triangle.n12medic2.ui.components.*
 import com.triangle.n12medic2.ui.theme.*
 import com.triangle.n12medic2.viewmodel.AnalyzesViewModel
+import com.triangle.n12medic2.viewmodel.OrderViewModel
 import kotlinx.coroutines.launch
 
 
@@ -92,6 +94,7 @@ class OrderActivity : ComponentActivity() {
         val lazyListState = rememberLazyListState()
         val sheetState = rememberModalBottomSheetState(initialValue = ModalBottomSheetValue.Hidden, skipHalfExpanded = true)
         val sharedPreferences = mContext.getSharedPreferences("shared", Context.MODE_PRIVATE)
+        val viewModel = ViewModelProvider(this)[OrderViewModel::class.java]
 
         var selectedSheet by rememberSaveable { mutableStateOf("address") }
 
@@ -118,6 +121,7 @@ class OrderActivity : ComponentActivity() {
                     userList[0].birthday,
                     userList[0].gender,
                     userList[0].image,
+                    userList[0].id,
                     cart
                 ))
             }
@@ -165,6 +169,7 @@ class OrderActivity : ComponentActivity() {
                                         it.birthday,
                                         it.gender,
                                         it.image,
+                                        userList[0].id,
                                         cart
                                     ))
                                 } else {
@@ -476,6 +481,7 @@ class OrderActivity : ComponentActivity() {
                                     .fillMaxWidth(),
                                 label = "Заказать",
                                 onClick = {
+                                          viewModel.sendOrder(addressValue, timeValue, selectedUsers, phoneValue, commentValue, sharedPreferences.getString("token", "")!!)
 //                                        val intent = Intent(mContext, PayActivity::class.java)
 //                                        startActivity(intent)
                                 },

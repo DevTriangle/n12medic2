@@ -1,6 +1,7 @@
 package com.triangle.n12medic2.viewmodel
 
 import android.content.ContentValues.TAG
+import android.content.SharedPreferences
 import android.graphics.Bitmap
 import android.net.Uri
 import android.util.Log
@@ -8,6 +9,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.triangle.n12medic2.common.ApiService
+import com.triangle.n12medic2.common.UserService
 import com.triangle.n12medic2.model.User
 import kotlinx.coroutines.launch
 
@@ -47,10 +49,15 @@ class ManageCardViewModel:ViewModel() {
         lastName: String,
         birthday: String,
         gender: String,
-        token: String
+        token: String,
+        addNew: Boolean,
+        uList: MutableList<User>,
+        sharedPreferences: SharedPreferences
     ) {
         errorMessage.value = null
         isSuccess.value = null
+
+        val userList = uList
 
         viewModelScope.launch {
             val apiService = ApiService.getInstance()
@@ -61,6 +68,14 @@ class ManageCardViewModel:ViewModel() {
 
                 if (json.code() == 200) {
                     isSuccess.value = true
+
+                    if (addNew) {
+                        userList.add(User(firstName, lastName, patronymic, birthday, gender, "", json.body()!!.get("id").asInt))
+                    } else {
+                        userList.add(0, User(firstName, lastName, patronymic, birthday, gender, "", json.body()!!.get("id").asInt))
+                    }
+
+                    UserService().savePatients(sharedPreferences, userList)
                 } else {
                     Log.d(TAG, "${json.code()} - ${json.body()?.get(" errors ").toString()}")
                     errorMessage.value = "${json.code()} - ${json.body()?.get(" errors ").toString()}"

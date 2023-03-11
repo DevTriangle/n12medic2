@@ -88,6 +88,9 @@ class ManageCardActivity : ComponentActivity() {
         LaunchedEffect(isSuccess) {
             if (isSuccess == true) {
                 isLoading = false
+
+                val homeIntent = Intent(mContext, HomeActivity::class.java)
+                startActivity(homeIntent)
             }
         }
 
@@ -281,20 +284,8 @@ class ManageCardActivity : ComponentActivity() {
                         enabled = firstName.isNotBlank() && patronymic.isNotBlank() && lastName.isNotBlank() && birthday.isNotBlank() && gender.isNotBlank(),
                         onClick = {
                             Log.d(TAG, "ManageCardScreen: $token")
-                            viewModel.createProfile(firstName, patronymic, lastName, birthday, gender, token!!)
+                            viewModel.createProfile(firstName, patronymic, lastName, birthday, gender, token!!, addNew, userList, sharedPreferences)
                             isLoading = true
-
-                            Log.d(TAG, "ManageCardScreen: $addNew")
-                            if (addNew) {
-                                userList.add(User(firstName, lastName, patronymic, birthday, gender, ""))
-                            } else {
-                                userList.add(0, User(firstName, lastName, patronymic, birthday, gender, ""))
-                            }
-
-                            UserService().savePatients(sharedPreferences, userList)
-
-                            val homeIntent = Intent(mContext, HomeActivity::class.java)
-                            startActivity(homeIntent)
                         }
                     )
                 }

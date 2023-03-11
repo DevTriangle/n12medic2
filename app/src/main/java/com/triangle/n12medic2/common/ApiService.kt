@@ -3,6 +3,7 @@ package com.triangle.n12medic2.common
 import com.google.gson.JsonObject
 import com.triangle.n12medic2.model.Analysis
 import com.triangle.n12medic2.model.News
+import com.triangle.n12medic2.model.Order
 import com.triangle.n12medic2.model.User
 import retrofit2.Response
 import retrofit2.Retrofit
@@ -52,6 +53,13 @@ interface ApiService {
     )
     @GET("catalog")
     suspend fun loadCatalog(): Response<MutableList<Analysis>>
+
+    @Headers(
+        "accept: application/json",
+        "Content-Type: application/json"
+    )
+    @GET("order")
+    suspend fun sendOrder(@Header("Authorization") token: String, @Body order: Order): Response<JsonObject>
 
     companion object {
         var apiService: ApiService? = null

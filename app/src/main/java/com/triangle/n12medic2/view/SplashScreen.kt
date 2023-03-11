@@ -56,7 +56,7 @@ class SplashScreen : ComponentActivity() {
                             val authIntent = Intent(mContext, CreatePasswordActivity::class.java)
                             startActivity(authIntent)
                         } else {
-                            val authIntent = Intent(mContext, PayActivity::class.java) //todo
+                            val authIntent = Intent(mContext, HomeActivity::class.java) //todo
                             startActivity(authIntent)
                         }
                     } else {
