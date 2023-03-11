@@ -24,7 +24,6 @@ class UserService {
                     tUser.get("bith").asString,
                     tUser.get("pol").asString,
                     tUser.get("image").asString,
-                    tUser.get("id").asInt,
                 )
             )
         }

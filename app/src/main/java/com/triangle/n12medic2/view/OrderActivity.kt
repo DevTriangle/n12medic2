@@ -481,9 +481,9 @@ class OrderActivity : ComponentActivity() {
                                     .fillMaxWidth(),
                                 label = "Заказать",
                                 onClick = {
-                                          viewModel.sendOrder(addressValue, timeValue, selectedUsers, phoneValue, commentValue, sharedPreferences.getString("token", "")!!)
-//                                        val intent = Intent(mContext, PayActivity::class.java)
-//                                        startActivity(intent)
+                                    viewModel.sendOrder(addressValue, timeValue, selectedUsers, phoneValue, commentValue, sharedPreferences.getString("token", "")!!)
+                                    val intent = Intent(mContext, PayActivity::class.java)
+                                    startActivity(intent)
                                 },
                                 //enabled = addressValue != "" && selectedUsers.isNotEmpty() && phoneValue != "" && timeValue != ""
                             )
