@@ -1,6 +1,7 @@
 package com.triangle.n12medic2.view
 
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -13,6 +14,7 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
@@ -26,6 +28,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -111,18 +114,26 @@ class PayActivity : ComponentActivity() {
                             fontSize = 14.sp,
                         )
                         Spacer(modifier = Modifier.height(8.dp))
-                        Text(
-                            text = buildAnnotatedString {
-                                append("Не забудьте ознакомиться с ")
-                                pushStringAnnotation("rules", annotation = "https://medic.madskill.ru/avatar/prav.pdf")
+                        val aString = buildAnnotatedString {
+                            append("Не забудьте ознакомиться с ")
+                            pushStringAnnotation("rules", annotation = "https://medic.madskill.ru/avatar/prav.pdf")
 
-                                withStyle(style = SpanStyle(color = MaterialTheme.colors.primary)) {
-                                    append("правилами подготовки к сдаче анализов")
+                            withStyle(style = SpanStyle(color = MaterialTheme.colors.primary)) {
+                                append("правилами подготовки к сдаче анализов")
+                            }
+                            pop()
+                        }
+                        ClickableText(
+                            text = aString,
+                            style = TextStyle(
+                                fontSize = 14.sp,
+                                textAlign = TextAlign.Center
+                            ),
+                            onClick = { offset ->
+                                aString.getStringAnnotations(tag = "rules", start = offset, end = offset).firstOrNull()?.let {
+                                    startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://medic.madskill.ru/avatar/prav.pdf")))
                                 }
-                                pop()
-                            },
-                            fontSize = 14.sp,
-                            textAlign = TextAlign.Center
+                            }
                         )
                     }
                 }
