@@ -1,5 +1,6 @@
 package com.triangle.n12medic2.ui.components
 
+import android.content.Context
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -11,23 +12,34 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.triangle.n12medic2.R
+import com.triangle.n12medic2.common.OrderService
+import com.triangle.n12medic2.model.Address
 import com.triangle.n12medic2.ui.theme.captionColor
 import com.triangle.n12medic2.ui.theme.descriptionColor
 import com.triangle.n12medic2.ui.theme.iconsColor
 import com.triangle.n12medic2.ui.theme.inputStroke
 
-// Нижний экран выбора адреса
+// Экран выбора адреса
 // Дата создания: 11.03.2023 13:51
 // Автор: Хасанов Альберт
 @Composable
-fun AddressBottomSheet() {
+fun AddressBottomSheet(
+    addressOnChange: (Address) -> Unit
+) {
+    val mContext = LocalContext.current
+    val sharedPreferences = mContext.getSharedPreferences("shared", Context.MODE_PRIVATE)
+
     var addressText by rememberSaveable { mutableStateOf("") }
+    var addressNameText by rememberSaveable { mutableStateOf("") }
     var lonText by rememberSaveable { mutableStateOf("") }
     var latText by rememberSaveable { mutableStateOf("") }
     var altText by rememberSaveable { mutableStateOf("") }
@@ -35,6 +47,8 @@ fun AddressBottomSheet() {
     var flatText by rememberSaveable { mutableStateOf("") }
     var entranceText by rememberSaveable { mutableStateOf("") }
     var floorText by rememberSaveable { mutableStateOf("") }
+
+    var doorText by rememberSaveable { mutableStateOf("") }
 
     var saveAddress by rememberSaveable { mutableStateOf(false) }
 
@@ -82,6 +96,7 @@ fun AddressBottomSheet() {
                 onValueChange = { addressText = it },
                 modifier = Modifier
                     .fillMaxWidth(),
+                singleLine = true,
                 label = {
                     Text(
                         text = "Ваш адрес",
@@ -99,6 +114,7 @@ fun AddressBottomSheet() {
                     modifier = Modifier
                         .fillMaxWidth(0.35f)
                         .padding(end = 12.5.dp),
+                    singleLine = true,
                     label = {
                         Text(
                             text = "Долгота",
@@ -114,6 +130,7 @@ fun AddressBottomSheet() {
                     modifier = Modifier
                         .fillMaxWidth(0.7f)
                         .padding(end = 12.5.dp),
+                    singleLine = true,
                     label = {
                         Text(
                             text = "Широта",
@@ -128,6 +145,7 @@ fun AddressBottomSheet() {
                     onValueChange = { altText = it },
                     modifier = Modifier
                         .fillMaxWidth(),
+                    singleLine = true,
                     label = {
                         Text(
                             text = "Высота",
@@ -146,6 +164,7 @@ fun AddressBottomSheet() {
                     modifier = Modifier
                         .fillMaxWidth(0.33f)
                         .padding(end = 12.5.dp),
+                    singleLine = true,
                     label = {
                         Text(
                             text = "Квартира",
@@ -161,6 +180,7 @@ fun AddressBottomSheet() {
                     modifier = Modifier
                         .fillMaxWidth(0.66f)
                         .padding(end = 12.5.dp),
+                    singleLine = true,
                     label = {
                         Text(
                             text = "Подъезд",
@@ -175,6 +195,7 @@ fun AddressBottomSheet() {
                     onValueChange = { floorText = it },
                     modifier = Modifier
                         .fillMaxWidth(),
+                    singleLine = true,
                     label = {
                         Text(
                             text = "Этаж",
@@ -187,10 +208,11 @@ fun AddressBottomSheet() {
             }
             Spacer(modifier = Modifier.height(16.dp))
             AppTextField(
-                value = floorText,
-                onValueChange = { floorText = it },
+                value = doorText,
+                onValueChange = { doorText = it },
                 modifier = Modifier
                     .fillMaxWidth(),
+                singleLine = true,
                 label = {
                     Text(
                         text = "Домофон",
@@ -201,7 +223,7 @@ fun AddressBottomSheet() {
                 changeBorder = false
             )
             Spacer(modifier = Modifier.height(6.dp))
-            Row(Modifier.fillMaxWidth()) {
+            Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween) {
                 Text(
                     text = "Сохранить этот адрес?",
                     fontSize = 16.sp,
@@ -215,32 +237,48 @@ fun AddressBottomSheet() {
                         checkedTrackAlpha = 1f,
                         uncheckedTrackColor = inputStroke,
                         uncheckedTrackAlpha = 1f,
+                        checkedThumbColor = Color.White,
+                        uncheckedThumbColor = Color.White,
                     )
                 )
             }
             AnimatedVisibility(visible = saveAddress) {
-                AppTextField(
-                    value = floorText,
-                    onValueChange = { floorText = it },
-                    modifier = Modifier
-                        .fillMaxWidth(),
-                    label = {
-                        Text(
-                            text = "Домофон",
-                            fontSize = 14.sp,
-                            color = descriptionColor
-                        )
-                    },
-                    placeholder = {
-                        Text(
-                            text = "Название: например дом, работа",
-                            fontSize = 15.sp,
-                            color = captionColor
-                        )
-                    },
-                    changeBorder = false
-                )
+                Column(modifier = Modifier.fillMaxWidth()) {
+                    Spacer(modifier = Modifier.height(14.dp))
+                    AppTextField(
+                        value = addressNameText,
+                        onValueChange = { addressNameText = it },
+                        modifier = Modifier
+                            .fillMaxWidth(),
+                        singleLine = true,
+                        label = {
+                            Text(
+                                text = "Домофон",
+                                fontSize = 14.sp,
+                                color = descriptionColor
+                            )
+                        },
+                        placeholder = {
+                            Text(
+                                text = "Название: например дом, работа",
+                                fontSize = 15.sp,
+                                color = captionColor
+                            )
+                        },
+                        changeBorder = false
+                    )
+                }
             }
+            Spacer(modifier = Modifier.height(14.dp))
+            AppButton(
+                label = "Подтвердить",
+                onClick = {
+                    val address = Address(addressNameText, addressText, latText, lonText, altText, flatText, entranceText, floorText, doorText)
+                    addressOnChange(address)
+
+                    OrderService().saveAddress(sharedPreferences, address)
+                }
+            )
         }
     }
 }

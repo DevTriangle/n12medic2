@@ -35,6 +35,7 @@ import com.triangle.n12medic2.ui.components.LoadingDialog
 import com.triangle.n12medic2.ui.theme.N12medic2Theme
 import com.triangle.n12medic2.ui.theme.captionColor
 import com.triangle.n12medic2.viewmodel.ManageCardViewModel
+import kotlin.math.log
 
 // Активити создания карты пациента
 // Дата создания: 08.03.2023 14:47
@@ -64,6 +65,8 @@ class ManageCardActivity : ComponentActivity() {
         val sharedPreferences = this.getSharedPreferences("shared", MODE_PRIVATE)
         val viewModel = ViewModelProvider(this)[ManageCardViewModel::class.java]
 
+        val addNew = sharedPreferences.getBoolean("addNew", false)
+
         val token = sharedPreferences.getString("token", "")
 
         var firstName by rememberSaveable { mutableStateOf("") }
@@ -77,6 +80,9 @@ class ManageCardActivity : ComponentActivity() {
         var isErrorVisible by rememberSaveable { mutableStateOf(false) }
 
         val userList: MutableList<User> = remember { mutableStateListOf() }
+        LaunchedEffect(Unit) {
+            userList.addAll(UserService().loadPatients(sharedPreferences))
+        }
 
         val isSuccess by viewModel.isSuccess.observeAsState()
         LaunchedEffect(isSuccess) {
@@ -278,8 +284,17 @@ class ManageCardActivity : ComponentActivity() {
                             viewModel.createProfile(firstName, patronymic, lastName, birthday, gender, token!!)
                             isLoading = true
 
-                            userList.add(0, User(firstName, lastName, patronymic, birthday, gender, ""))
+                            Log.d(TAG, "ManageCardScreen: $addNew")
+                            if (addNew) {
+                                userList.add(User(firstName, lastName, patronymic, birthday, gender, ""))
+                            } else {
+                                userList.add(0, User(firstName, lastName, patronymic, birthday, gender, ""))
+                            }
+
                             UserService().savePatients(sharedPreferences, userList)
+
+                            val homeIntent = Intent(mContext, HomeActivity::class.java)
+                            startActivity(homeIntent)
                         }
                     )
                 }
