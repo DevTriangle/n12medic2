@@ -485,7 +485,7 @@ class OrderActivity : ComponentActivity() {
 //                                        val intent = Intent(mContext, PayActivity::class.java)
 //                                        startActivity(intent)
                                 },
-                                enabled = addressValue != "" && selectedUsers.isNotEmpty() && phoneValue != "" && timeValue != ""
+                                //enabled = addressValue != "" && selectedUsers.isNotEmpty() && phoneValue != "" && timeValue != ""
                             )
                             Spacer(modifier = Modifier.height(12.dp))
                         }
