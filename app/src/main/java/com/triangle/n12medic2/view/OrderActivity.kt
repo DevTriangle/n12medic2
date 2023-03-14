@@ -13,6 +13,7 @@ import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -27,14 +28,15 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.ViewModelProvider
 import com.triangle.n12medic2.R
 import com.triangle.n12medic2.common.CartService
 import com.triangle.n12medic2.common.OrderService
 import com.triangle.n12medic2.common.UserService
-import com.triangle.n12medic2.model.CartItem
-import com.triangle.n12medic2.model.User
+import com.triangle.n12medic2.model.*
 import com.triangle.n12medic2.ui.components.*
 import com.triangle.n12medic2.ui.theme.*
+import com.triangle.n12medic2.viewmodel.OrderViewModel
 import kotlinx.coroutines.launch
 
 // Активити Оформление заказа/1 пациент
@@ -62,10 +64,33 @@ class OrderActivity : ComponentActivity() {
     @OptIn(ExperimentalMaterialApi::class)
     @Composable
     fun OrderScreen() {
+        val viewModel = ViewModelProvider(this)[OrderViewModel::class.java]
+
         val scope = rememberCoroutineScope()
         val mContext = LocalContext.current
         val sharedPreferences = getSharedPreferences("shared", MODE_PRIVATE)
         val sheetState = rememberModalBottomSheetState(initialValue = ModalBottomSheetValue.Hidden, skipHalfExpanded = true)
+
+        val token = sharedPreferences.getString("token", "")
+
+        var isErrorVisible by rememberSaveable { mutableStateOf(false) }
+        var isLoading by rememberSaveable { mutableStateOf(false) }
+
+        val isSuccess by viewModel.isSuccess.observeAsState()
+        LaunchedEffect(isSuccess) {
+            if (isSuccess == true) {
+                val intent = Intent(mContext, PayActivity::class.java)
+                startActivity(intent)
+            }
+        }
+
+        val errorMessage by viewModel.message.observeAsState()
+        LaunchedEffect(errorMessage) {
+            if (errorMessage != null) {
+                isLoading = false
+                isErrorVisible = true
+            }
+        }
 
         var selectedScreen by rememberSaveable { mutableStateOf("address") }
 
@@ -430,8 +455,6 @@ class OrderActivity : ComponentActivity() {
                                     }
                                 }
 
-                                Log.d(TAG, "OrderScreen: ")
-
                                 Text(
                                     text = "$count анализ",
                                     fontSize = 17.sp,
@@ -449,7 +472,32 @@ class OrderActivity : ComponentActivity() {
                                     .fillMaxWidth(),
                                 label = "Заказать",
                                 onClick = {
+                                    var selectedPatients = ArrayList<OrderPatient>()
 
+                                    for (u in selectedUsers) {
+                                        var orderCart = ArrayList<OrderItems>()
+                                        for (c in u.cart) {
+                                            orderCart.add(OrderItems(c.id, c.price))
+                                        }
+                                        selectedPatients.add(OrderPatient(
+                                            u.lastname + " " + u.firstName,
+                                            orderCart
+                                        ))
+                                    }
+
+                                     val order = Order(
+                                         addressValue,
+                                         timeValue,
+                                         phoneValue,
+                                         commentValue,
+                                         "",
+                                         selectedPatients
+                                     )
+
+                                    if (token != null) {
+                                        isLoading = true
+                                        viewModel.sendOrder(order, token)
+                                    }
                                 },
                                 enabled = addressValue.isNotEmpty() && timeValue.isNotEmpty() && phoneValue.isNotEmpty()
                             )
@@ -458,6 +506,30 @@ class OrderActivity : ComponentActivity() {
                     }
                 }
             }
+        }
+
+        if (isErrorVisible) {
+            AlertDialog(
+                title = { Text(
+                    text = "Ошибка",
+                    fontSize = 18.sp
+                ) },
+                text = { Text(
+                    text = errorMessage.toString(),
+                    fontSize = 15.sp
+                ) },
+                onDismissRequest = {isErrorVisible = false},
+                confirmButton = {
+                    AppTextButton(
+                        label = "Ок",
+                        onClick = { isErrorVisible = false }
+                    )
+                }
+            )
+        }
+
+        if (isLoading) {
+            LoadingDialog()
         }
     }
 }

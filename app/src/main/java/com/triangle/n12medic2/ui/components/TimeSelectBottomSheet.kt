@@ -186,8 +186,8 @@ fun TimeSelectBottomSheet(
         )
         LazyVerticalGrid(
             columns = GridCells.Adaptive(70.dp),
-            horizontalArrangement = Arrangement.spacedBy(24.dp),
-            verticalArrangement = Arrangement.spacedBy(24.dp),
+            horizontalArrangement = Arrangement.spacedBy(16.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
             items(times) { t ->
                 TimeChip(time = t, selected = selectedTime == t, onSelect = {
@@ -195,6 +195,7 @@ fun TimeSelectBottomSheet(
                 })
             }
         }
+        Spacer(modifier = Modifier.height(16.dp))
         AppButton(
             modifier = Modifier
                 .fillMaxWidth(),
@@ -215,18 +216,19 @@ private fun TimeChip(
     selected: Boolean,
     onSelect: (String) -> Unit
 ) {
-    Card(
-        elevation = 0.dp,
-        backgroundColor = if (selected) MaterialTheme.colors.primary else inputBG,
+    Box(
         modifier = Modifier
             .width(70.dp)
             .height(40.dp)
+            .clip(MaterialTheme.shapes.medium)
+            .background(if (selected) MaterialTheme.colors.primary else inputBG)
             .clickable {
                 onSelect(time)
             }
     ) {
         Text(
             modifier = Modifier
+                .align(Alignment.Center)
                 .padding(horizontal = 14.dp, vertical = 10.dp),
             text = time,
             color = if (selected) Color.White else descriptionColor,
