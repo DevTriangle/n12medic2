@@ -31,7 +31,7 @@ class NotificationWorker(
         val manager = context!!.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         manager.createNotificationChannel(channel)
 
-        val notification = NotificationCompat.Builder(context)
+        val notification = NotificationCompat.Builder(context, "c1")
             .setSmallIcon(R.drawable.ic_app_foreground)
             .setContentTitle("Напоминание о записи")
             .setContentText("Напоминание о записи")
