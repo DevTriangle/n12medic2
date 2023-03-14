@@ -1,8 +1,10 @@
 package com.triangle.n12medic2.view
 
 import android.annotation.SuppressLint
+import android.content.ContentValues.TAG
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.*
@@ -70,7 +72,6 @@ class OrderActivity : ComponentActivity() {
         var addressValue by rememberSaveable { mutableStateOf("") }
         var timeValue by rememberSaveable { mutableStateOf("") }
         var phoneValue by rememberSaveable { mutableStateOf("") }
-        val address = OrderService().loadAddress(sharedPreferences)
         var commentValue by rememberSaveable { mutableStateOf("") }
         
         var selectedPatientIndex = 0
@@ -88,13 +89,9 @@ class OrderActivity : ComponentActivity() {
         }
 
         val cart: MutableList<CartItem> = remember { mutableStateListOf() }
-
-
         val users: MutableList<User> = remember { mutableStateListOf() }
         val selectedUsers: MutableList<User> = remember { mutableStateListOf() }
-        val sUsers: MutableList<User> = remember {
-            mutableStateListOf()
-        }
+        val sUsers: MutableList<User> = remember { mutableStateListOf() }
 
         LaunchedEffect(Unit) {
             cart.addAll(CartService().loadCart(sharedPreferences))
@@ -111,10 +108,11 @@ class OrderActivity : ComponentActivity() {
                     cart
                 ))
             }
-        }
 
-        if (address != null) {
-            addressValue = address.address
+            val address = OrderService().loadAddress(sharedPreferences)
+            if (address != null) {
+                addressValue = address.address
+            }
         }
 
         ModalBottomSheetLayout(
@@ -141,12 +139,12 @@ class OrderActivity : ComponentActivity() {
                                     selectedUsers.add(it)
                                 } else {
                                     selectedUsers[selectedPatientIndex] = it
-
-                                    sUsers.clear()
-                                    sUsers.addAll(selectedUsers)
-                                    selectedUsers.clear()
-                                    selectedUsers.addAll(sUsers)
                                 }
+
+                                sUsers.clear()
+                                sUsers.addAll(selectedUsers)
+                                selectedUsers.clear()
+                                selectedUsers.addAll(sUsers)
                             },
                             onCloseClick = { scope.launch { sheetState.hide() } },
                             userList = users
@@ -296,6 +294,11 @@ class OrderActivity : ComponentActivity() {
                                         },
                                         onCartChange = { tcart ->
                                             selectedUsers[i].cart = tcart
+
+                                            sUsers.clear()
+                                            sUsers.addAll(selectedUsers)
+                                            selectedUsers.clear()
+                                            selectedUsers.addAll(sUsers)
                                         },
                                         cart = cart
                                     )
@@ -328,7 +331,7 @@ class OrderActivity : ComponentActivity() {
                             AppTextField(
                                 value = phoneValue,
                                 onValueChange = {
-                                    addressValue = it
+                                    phoneValue = it
                                 },
                                 label = {
                                     Text(
@@ -417,13 +420,25 @@ class OrderActivity : ComponentActivity() {
                             }
                             Spacer(modifier = Modifier.height(29.dp))
                             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                                var count = 0
+                                var sum = 0
+
+                                for (u in selectedUsers.distinct()) {
+                                    for (c in u.cart.distinct()) {
+                                        count += 1
+                                        sum += c.price.toInt()
+                                    }
+                                }
+
+                                Log.d(TAG, "OrderScreen: ")
+
                                 Text(
-                                    text = "count анализ",
+                                    text = "$count анализ",
                                     fontSize = 17.sp,
                                     fontWeight = FontWeight.Medium,
                                 )
                                 Text(
-                                    text = "sum ₽",
+                                    text = "$sum ₽",
                                     fontSize = 17.sp,
                                     fontWeight = FontWeight.Medium,
                                 )

@@ -1,5 +1,7 @@
 package com.triangle.n12medic2.ui.components
 
+import android.content.ContentValues.TAG
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -67,8 +69,10 @@ fun MultipleUserCard(
     var tCart: MutableList<CartItem> = remember {
         mutableStateListOf()
     }
-    
-    tCart.addAll(cart)
+
+    LaunchedEffect(Unit) {
+        tCart.addAll(cart)
+    }
     
     Card(
         elevation = 0.dp,
@@ -80,7 +84,7 @@ fun MultipleUserCard(
                 .fillMaxWidth()
                 .padding(16.dp, 24.dp)
         ) {
-            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
                 AppTextField(
                     modifier = Modifier
                         .fillMaxWidth(0.7f),
@@ -118,7 +122,7 @@ fun MultipleUserCard(
                     )
                 }
             }
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(8.dp))
             for ((index, c) in cart.withIndex()) {
                 var isChecked by rememberSaveable { mutableStateOf(true) }
                 Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
@@ -131,6 +135,8 @@ fun MultipleUserCard(
                                 if (isChecked) tCart.add(c)
                                 else tCart.remove(c)
 
+                                Log.d(TAG, "MultipleUserCard: ${tCart.size}")
+
                                 onCartChange(tCart)
                             },
                             colors =CheckboxDefaults.colors(
@@ -140,6 +146,7 @@ fun MultipleUserCard(
                         )
                         Spacer(modifier = Modifier.width(16.dp))
                         Text(
+                            modifier = Modifier.fillMaxWidth(0.7f),
                             text = c.name,
                             fontSize = 12.sp,
                             color = if (isChecked) Color.Black else captionColor

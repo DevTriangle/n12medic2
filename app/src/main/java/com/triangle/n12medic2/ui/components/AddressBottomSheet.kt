@@ -266,8 +266,8 @@ fun AddressBottomSheet(
             Column(Modifier.fillMaxWidth()) {
                 AppTextField(
                     modifier = Modifier.fillMaxWidth(),
-                    value = doorphone,
-                    onValueChange = { doorphone = it },
+                    value = addressName,
+                    onValueChange = { addressName = it },
                     placeholder = {
                         Text(
                             text = "Название: например дом, работа",
