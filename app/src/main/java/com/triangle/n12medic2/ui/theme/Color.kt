@@ -5,6 +5,7 @@ import androidx.compose.ui.graphics.Color
 val primaryColor = Color(0xFF1A6FEE)
 val primaryInactiveColor = Color(0xFFC9D4FB)
 val primaryVariantColor = Color(0xFF57A9FF)
+val errorColor = Color(0xFFFD3535)
 
 val captionColor = Color(0xFF939396)
 val inputBG = Color(0xFFF5F5F9)

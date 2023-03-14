@@ -150,7 +150,7 @@ fun TimeSelectBottomSheet(
                 shape = CircleShape,
                 size = 24.dp
             ) {
-
+                onCloseClick()
             }
         }
         Spacer(modifier = Modifier.height(24.dp))

@@ -26,6 +26,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.ViewModelProvider
 import com.triangle.n12medic2.R
+import com.triangle.n12medic2.common.CartService
 import com.triangle.n12medic2.common.UserService
 import com.triangle.n12medic2.model.User
 import com.triangle.n12medic2.ui.components.AppButton
@@ -64,6 +65,8 @@ class ManageCardActivity : ComponentActivity() {
         val sharedPreferences = this.getSharedPreferences("shared", MODE_PRIVATE)
         val viewModel = ViewModelProvider(this)[ManageCardViewModel::class.java]
 
+        val addNew = sharedPreferences.getBoolean("addNew", false)
+
         val token = sharedPreferences.getString("token", "")
 
         var firstName by rememberSaveable { mutableStateOf("") }
@@ -77,11 +80,17 @@ class ManageCardActivity : ComponentActivity() {
         var isErrorVisible by rememberSaveable { mutableStateOf(false) }
 
         val userList: MutableList<User> = remember { mutableStateListOf() }
+        LaunchedEffect(Unit) {
+            userList.addAll(UserService().loadPatients(sharedPreferences))
+        }
 
         val isSuccess by viewModel.isSuccess.observeAsState()
         LaunchedEffect(isSuccess) {
             if (isSuccess == true) {
                 isLoading = false
+
+                val intent = Intent(mContext, HomeActivity::class.java)
+                startActivity(intent)
             }
         }
 
@@ -274,11 +283,15 @@ class ManageCardActivity : ComponentActivity() {
                         label = "Создать",
                         enabled = firstName.isNotBlank() && patronymic.isNotBlank() && lastName.isNotBlank() && birthday.isNotBlank() && gender.isNotBlank(),
                         onClick = {
-                            Log.d(TAG, "ManageCardScreen: $token")
                             viewModel.createProfile(firstName, patronymic, lastName, birthday, gender, token!!)
                             isLoading = true
 
-                            userList.add(0, User(firstName, lastName, patronymic, birthday, gender, ""))
+                            if (addNew) {
+                                userList.add(User(firstName, lastName, patronymic, birthday, gender, ""))
+                            } else {
+                                userList.add(User(firstName, lastName, patronymic, birthday, gender, ""))
+                            }
+
                             UserService().savePatients(sharedPreferences, userList)
                         }
                     )

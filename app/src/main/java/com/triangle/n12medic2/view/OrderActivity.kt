@@ -5,7 +5,7 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.background
+import androidx.compose.foundation.*
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.*
@@ -14,9 +14,14 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -24,6 +29,7 @@ import com.triangle.n12medic2.R
 import com.triangle.n12medic2.common.CartService
 import com.triangle.n12medic2.common.OrderService
 import com.triangle.n12medic2.common.UserService
+import com.triangle.n12medic2.model.CartItem
 import com.triangle.n12medic2.model.User
 import com.triangle.n12medic2.ui.components.*
 import com.triangle.n12medic2.ui.theme.*
@@ -66,7 +72,9 @@ class OrderActivity : ComponentActivity() {
         var phoneValue by rememberSaveable { mutableStateOf("") }
         val address = OrderService().loadAddress(sharedPreferences)
         var commentValue by rememberSaveable { mutableStateOf("") }
-
+        
+        var selectedPatientIndex = 0
+        
         val addressInteraction = remember { MutableInteractionSource() }
         if (addressInteraction.collectIsPressedAsState().value) {
             selectedScreen = "address"
@@ -79,13 +87,29 @@ class OrderActivity : ComponentActivity() {
             scope.launch { sheetState.show() }
         }
 
+        val cart: MutableList<CartItem> = remember { mutableStateListOf() }
+
+
         val users: MutableList<User> = remember { mutableStateListOf() }
         val selectedUsers: MutableList<User> = remember { mutableStateListOf() }
+        val sUsers: MutableList<User> = remember {
+            mutableStateListOf()
+        }
 
         LaunchedEffect(Unit) {
+            cart.addAll(CartService().loadCart(sharedPreferences))
             users.addAll(UserService().loadPatients(sharedPreferences))
+
             if (users.isNotEmpty()) {
-                selectedUsers.add(users[0])
+                selectedUsers.add(User(
+                    users[0].firstName,
+                    users[0].lastname,
+                    users[0].patronymic,
+                    users[0].birthday,
+                    users[0].gender,
+                    users[0].image,
+                    cart
+                ))
             }
         }
 
@@ -111,7 +135,22 @@ class OrderActivity : ComponentActivity() {
                         }
                     }
                     "patient" -> {
+                        PatientSelectBottomSheet(
+                            onPatientChange = {
+                                if (selectedPatientIndex == -1) {
+                                    selectedUsers.add(it)
+                                } else {
+                                    selectedUsers[selectedPatientIndex] = it
 
+                                    sUsers.clear()
+                                    sUsers.addAll(selectedUsers)
+                                    selectedUsers.clear()
+                                    selectedUsers.addAll(sUsers)
+                                }
+                            },
+                            onCloseClick = { scope.launch { sheetState.hide() } },
+                            userList = users
+                        )
                     }
                 }
             },
@@ -125,7 +164,7 @@ class OrderActivity : ComponentActivity() {
                         AppIconButton(
                             modifier = Modifier
                                 .padding(top = 20.dp),
-                            icon = painterResource(id = com.triangle.n12medic2.R.drawable.ic_back),
+                            icon = painterResource(id = R.drawable.ic_back),
                             size = 40.dp
                         ) {
                             val intent = Intent(mContext, HomeActivity::class.java)
@@ -147,7 +186,10 @@ class OrderActivity : ComponentActivity() {
                 }
             ) {
                 Box(Modifier.padding(it)) {
-                    Column(modifier = Modifier.fillMaxWidth()) {
+                    Column(modifier = Modifier
+                        .fillMaxWidth()
+                        .verticalScroll(rememberScrollState())
+                    ) {
                         Column(
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -198,7 +240,90 @@ class OrderActivity : ComponentActivity() {
                                 }
                             )
                             Spacer(modifier = Modifier.height(32.dp))
-                            if ()
+                            Text(
+                                text = buildAnnotatedString {
+                                    append("Кто будет сдавать анализы?")
+                                    withStyle(style = SpanStyle(color = MaterialTheme.colors.error)) {
+                                        append(" *")
+                                    }
+                                },
+                                fontSize = 14.sp,
+                                color = descriptionColor
+                            )
+                            if (selectedUsers.size == 1) {
+                                AppTextField(
+                                    value = selectedUsers[0].lastname + " " + selectedUsers[0].firstName,
+                                    onValueChange = {},
+                                    readOnly = true,
+                                    leadingIcon = {
+                                        Image(
+                                            painter = if(selectedUsers[0].gender == "Мужской") painterResource(id = R.drawable.ic_male) else painterResource(id = R.drawable.ic_female),
+                                            contentDescription = "",
+                                            modifier = Modifier.size(24.dp)
+                                        )
+                                    },
+                                    trailingIcon = {
+                                        IconButton(
+                                            onClick = {
+                                                scope.launch {
+                                                    selectedScreen = "patient"
+                                                    selectedPatientIndex = 0
+                                                    sheetState.show()
+                                                }
+                                            }
+                                        ) {
+                                            Icon(
+                                                painter = painterResource(id = R.drawable.ic_expand),
+                                                contentDescription = "",
+                                                tint = descriptionColor
+                                            )
+                                        }
+                                    }
+                                )
+                                Spacer(modifier = Modifier.height(16.dp))
+                            } else if (selectedUsers.size > 1) {
+                                for ((i, u) in selectedUsers.withIndex()) {
+                                    MultipleUserCard(
+                                        user = u,
+                                        onUserClick = {
+                                            selectedPatientIndex = i
+                                            scope.launch {
+                                                sheetState.show()
+                                            }
+                                        },
+                                        onRemoveClick = { usr ->
+                                            selectedUsers.remove(usr)
+                                        },
+                                        onCartChange = { tcart ->
+                                            selectedUsers[i].cart = tcart
+                                        },
+                                        cart = cart
+                                    )
+                                    Spacer(modifier = Modifier.height(16.dp))
+                                }
+                            }
+
+                            AppOutlinedButton(
+                                label = "Добавить еще пациента",
+                                onClick = {
+                                   scope.launch {
+                                       selectedScreen = "patient"
+                                       selectedPatientIndex = -1
+                                       sheetState.show()
+                                   }
+                                },
+                                modifier = Modifier
+                                    .fillMaxWidth(),
+                                border = BorderStroke(1.dp, MaterialTheme.colors.primary),
+                                colors = ButtonDefaults.buttonColors(
+                                    backgroundColor = Color.White,
+                                    contentColor = MaterialTheme.colors.primary
+                                ),
+                                textStyle = TextStyle(
+                                    fontWeight = FontWeight.Normal
+                                ),
+                                fontSize = 15.sp
+                            )
                             Spacer(modifier = Modifier.height(32.dp))
                             AppTextField(
                                 value = phoneValue,
@@ -221,7 +346,7 @@ class OrderActivity : ComponentActivity() {
                             )
                             Spacer(modifier = Modifier.height(16.dp))
                             Column(modifier = Modifier.fillMaxWidth()) {
-                                Row(Modifier.fillMaxWidth()) {
+                                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                                     Text(
                                         text = "Комментарий",
                                         fontSize = 14.sp,
@@ -305,10 +430,13 @@ class OrderActivity : ComponentActivity() {
                             }
                             Spacer(modifier = Modifier.height(12.dp))
                             AppButton(
+                                modifier = Modifier
+                                    .fillMaxWidth(),
                                 label = "Заказать",
                                 onClick = {
 
                                 },
+                                enabled = addressValue.isNotEmpty() && timeValue.isNotEmpty() && phoneValue.isNotEmpty()
                             )
                             Spacer(modifier = Modifier.height(16.dp))
                         }
