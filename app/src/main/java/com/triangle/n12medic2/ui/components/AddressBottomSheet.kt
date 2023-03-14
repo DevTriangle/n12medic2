@@ -55,9 +55,13 @@ import com.triangle.n12medic2.ui.components.LoadingDialog
 import com.triangle.n12medic2.ui.theme.captionColor
 import com.triangle.n12medic2.ui.theme.descriptionColor
 import com.triangle.n12medic2.ui.theme.iconsColor
+import com.triangle.n12medic2.ui.theme.inputBG
 import com.triangle.n12medic2.view.ManageCardActivity
 import com.triangle.n12medic2.viewmodel.ManageCardViewModel
 
+// Экран выбора адреса
+// Дата создания: 14.03.2023 09:24
+// Автор: Triangle
 @Composable
 fun AddressBottomSheet(
     onAddressChange: (String) -> Unit
@@ -65,7 +69,7 @@ fun AddressBottomSheet(
     val mContext = LocalContext.current
     val sharedPreferences = mContext.getSharedPreferences("shared", Context.MODE_PRIVATE)
 
-    val address = sharedPreferences.getString("address", null)
+    val address = OrderService().loadAddress(sharedPreferences)
 
     var addressValue by rememberSaveable { mutableStateOf("") }
     var addressName by rememberSaveable { mutableStateOf("") }
@@ -83,12 +87,20 @@ fun AddressBottomSheet(
     var isSave by rememberSaveable { mutableStateOf(false) }
 
     if (address != null) {
-        addressValue = address
+        addressValue = address.address
+        lon = address.lat
+        lat = address.lon
+        alt = address.alt
+        flat = address.flat
+        entrace = address.entrance
+        floor = address.floor
+        doorphone = address.doorphone
     }
 
     Column(
         modifier = Modifier
             .fillMaxWidth()
+            .padding(horizontal = 20.dp, vertical = 24.dp)
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -228,12 +240,26 @@ fun AddressBottomSheet(
             },
         )
         Spacer(modifier = Modifier.height(6.dp))
-        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
             Text(
                 text = "Сохранить этот адрес?",
                 softWrap = true
             )
-            Checkbox(checked = isSave, onCheckedChange = {isSave = it})
+            Switch(
+                checked = isSave,
+                onCheckedChange = {isSave = it},
+                colors = SwitchDefaults.colors(
+                    checkedThumbColor = Color.White,
+                    checkedTrackAlpha = 1f,
+                    checkedTrackColor = MaterialTheme.colors.primary,
+                    uncheckedTrackColor = inputBG,
+                    uncheckedTrackAlpha = 1f
+                )
+            )
         }
         Spacer(modifier = Modifier.height(16.dp))
         AnimatedVisibility(visible = isSave) {
@@ -254,12 +280,14 @@ fun AddressBottomSheet(
             }
         }
         AppButton(
+            modifier = Modifier
+                .fillMaxWidth(),
             label = "Подтвердить",
             onClick = {
-                val address = Address(addressName, addressValue, lon, lat, alt, flat, entrace, floor, doorphone)
+                val add = Address(addressName, addressValue, lon, lat, alt, flat, entrace, floor, doorphone)
 
                 if (isSave) {
-                   OrderService().saveAddress(sharedPreferences, address)
+                   OrderService().saveAddress(sharedPreferences, add)
                 }
 
                 onAddressChange(addressValue)

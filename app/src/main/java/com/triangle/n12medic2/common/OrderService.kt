@@ -19,4 +19,11 @@ class OrderService {
             apply()
         }
     }
+
+    // Метод для получения адреса
+    // Дата создания: 14.03.2023 8:58
+    // Автор: Triangle
+    fun loadAddress(sharedPreferences: SharedPreferences): Address? {
+        return Gson().fromJson(sharedPreferences.getString("address", null), Address::class.java)
+    }
 }
