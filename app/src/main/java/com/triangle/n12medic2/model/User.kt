@@ -14,6 +14,9 @@ data class User(
     @SerializedName("bith") var birthday: String,
     @SerializedName("pol") var gender: String,
     @SerializedName("image") var image: String,
+<<<<<<< HEAD
     @SerializedName("id") var id: Int? = null,
+=======
+>>>>>>> Session-51
     @SerializedName("cart") var cart: MutableList<CartItem> = ArrayList<CartItem>().toMutableList(),
 )

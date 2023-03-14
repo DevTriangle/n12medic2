@@ -137,7 +137,8 @@ fun AppOutlinedButton(
         disabledBackgroundColor = Color.White
     ),
     contentPadding: PaddingValues = PaddingValues(16.dp),
-    fontSize: TextUnit = 17.sp
+    fontSize: TextUnit = 17.sp,
+    textStyle: TextStyle = LocalTextStyle.current
 ) {
     Button(
         modifier = modifier,
@@ -153,7 +154,8 @@ fun AppOutlinedButton(
         Text(
             text = label,
             fontWeight = FontWeight.SemiBold,
-            fontSize = fontSize
+            fontSize = fontSize,
+            style = textStyle
         )
     }
 }

@@ -26,6 +26,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.ViewModelProvider
 import com.triangle.n12medic2.R
+import com.triangle.n12medic2.common.CartService
 import com.triangle.n12medic2.common.UserService
 import com.triangle.n12medic2.model.User
 import com.triangle.n12medic2.ui.components.AppButton
@@ -89,8 +90,13 @@ class ManageCardActivity : ComponentActivity() {
             if (isSuccess == true) {
                 isLoading = false
 
+<<<<<<< HEAD
                 val homeIntent = Intent(mContext, HomeActivity::class.java)
                 startActivity(homeIntent)
+=======
+                val intent = Intent(mContext, HomeActivity::class.java)
+                startActivity(intent)
+>>>>>>> Session-51
             }
         }
 
@@ -283,9 +289,22 @@ class ManageCardActivity : ComponentActivity() {
                         label = "Создать",
                         enabled = firstName.isNotBlank() && patronymic.isNotBlank() && lastName.isNotBlank() && birthday.isNotBlank() && gender.isNotBlank(),
                         onClick = {
+<<<<<<< HEAD
                             Log.d(TAG, "ManageCardScreen: $token")
                             viewModel.createProfile(firstName, patronymic, lastName, birthday, gender, token!!, addNew, userList, sharedPreferences)
                             isLoading = true
+=======
+                            viewModel.createProfile(firstName, patronymic, lastName, birthday, gender, token!!)
+                            isLoading = true
+
+                            if (addNew) {
+                                userList.add(User(firstName, lastName, patronymic, birthday, gender, ""))
+                            } else {
+                                userList.add(User(firstName, lastName, patronymic, birthday, gender, ""))
+                            }
+
+                            UserService().savePatients(sharedPreferences, userList)
+>>>>>>> Session-51
                         }
                     )
                 }

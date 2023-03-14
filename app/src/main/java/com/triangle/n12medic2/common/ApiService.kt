@@ -56,9 +56,14 @@ interface ApiService {
 
     @Headers(
         "accept: application/json",
+<<<<<<< HEAD
         "Content-Type: application/json"
     )
     @GET("order")
+=======
+    )
+    @POST("order")
+>>>>>>> Session-51
     suspend fun sendOrder(@Header("Authorization") token: String, @Body order: Order): Response<JsonObject>
 
     companion object {

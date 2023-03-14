@@ -73,7 +73,8 @@ fun AppTextField(
             value = value,
             modifier = modifier
                 .background(colors.backgroundColor(enabled).value, shape)
-                .border(1.dp, if (value != "" && changeBorder) iconsColor else inputStroke, shape),
+                .border(1.dp, if (value != "" && changeBorder) iconsColor else inputStroke, shape)
+                .fillMaxWidth(),
             onValueChange = onValueChange,
             enabled = enabled,
             readOnly = readOnly,
