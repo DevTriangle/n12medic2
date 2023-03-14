@@ -33,11 +33,13 @@ import com.triangle.n12medic2.R
 import com.triangle.n12medic2.common.CartService
 import com.triangle.n12medic2.common.OrderService
 import com.triangle.n12medic2.common.UserService
+import com.triangle.n12medic2.common.scheduleNotification
 import com.triangle.n12medic2.model.*
 import com.triangle.n12medic2.ui.components.*
 import com.triangle.n12medic2.ui.theme.*
 import com.triangle.n12medic2.viewmodel.OrderViewModel
 import kotlinx.coroutines.launch
+import java.time.LocalDateTime
 
 // Активити Оформление заказа/1 пациент
 // Дата создания: 10.03.2023 11:14
@@ -70,6 +72,9 @@ class OrderActivity : ComponentActivity() {
         val mContext = LocalContext.current
         val sharedPreferences = getSharedPreferences("shared", MODE_PRIVATE)
         val sheetState = rememberModalBottomSheetState(initialValue = ModalBottomSheetValue.Hidden, skipHalfExpanded = true)
+
+        var order = OrderService().loadOrder(sharedPreferences)
+        var ldt = LocalDateTime.now()
 
         val token = sharedPreferences.getString("token", "")
 
@@ -122,7 +127,7 @@ class OrderActivity : ComponentActivity() {
             cart.addAll(CartService().loadCart(sharedPreferences))
             users.addAll(UserService().loadPatients(sharedPreferences))
 
-            if (users.isNotEmpty()) {
+            if (users.isNotEmpty() && order == null) {
                 selectedUsers.add(User(
                     users[0].firstName,
                     users[0].lastname,
@@ -132,6 +137,13 @@ class OrderActivity : ComponentActivity() {
                     users[0].image,
                     cart
                 ))
+            }
+
+            if (order != null) {
+                timeValue = order!!.date_time
+                phoneValue = order!!.phone
+                commentValue = order!!.phone
+                selectedUsers.addAll(OrderService().loadOrderPatients(sharedPreferences))
             }
 
             val address = OrderService().loadAddress(sharedPreferences)
@@ -152,6 +164,9 @@ class OrderActivity : ComponentActivity() {
                         TimeSelectBottomSheet(
                             onTimeChange = {
                                 timeValue = it
+                            },
+                            onDateTimeChange = {
+                                ldt = it
                             }
                         ) {
                             scope.launch { sheetState.hide() }
@@ -485,19 +500,23 @@ class OrderActivity : ComponentActivity() {
                                         ))
                                     }
 
-                                     val order = Order(
-                                         addressValue,
-                                         timeValue,
-                                         phoneValue,
-                                         commentValue,
-                                         "",
-                                         selectedPatients
-                                     )
+                                    if (order == null) {
+                                        order = Order(
+                                            addressValue,
+                                            timeValue,
+                                            phoneValue,
+                                            commentValue,
+                                            "",
+                                            selectedPatients
+                                        )
+                                    }
 
                                     if (token != null) {
                                         isLoading = true
-                                        viewModel.sendOrder(order, token)
+                                        viewModel.sendOrder(order!!, token)
                                     }
+
+                                    scheduleNotification(mContext, ldt.minusMinutes(30))
                                 },
                                 enabled = addressValue.isNotEmpty() && timeValue.isNotEmpty() && phoneValue.isNotEmpty()
                             )

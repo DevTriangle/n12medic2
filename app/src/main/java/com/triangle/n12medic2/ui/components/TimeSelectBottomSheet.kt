@@ -5,6 +5,7 @@ import androidx.compose.runtime.Composable
 import android.app.Activity
 import android.app.DatePickerDialog
 import android.content.ContentValues
+import android.content.ContentValues.TAG
 import android.content.Context
 import android.content.Intent
 import android.provider.MediaStore
@@ -64,8 +65,10 @@ import com.triangle.n12medic2.ui.theme.inputBG
 import com.triangle.n12medic2.view.ManageCardActivity
 import com.triangle.n12medic2.viewmodel.ManageCardViewModel
 import java.text.SimpleDateFormat
+import java.time.LocalDate
 import java.time.LocalDateTime
-import java.util.Calendar
+import java.time.LocalTime
+import java.util.*
 
 // Экран выбора времени
 // Дата создания: 14.03.2023 09:24
@@ -74,13 +77,19 @@ import java.util.Calendar
 @Composable
 fun TimeSelectBottomSheet(
     onTimeChange: (String) -> Unit,
+    onDateTimeChange: (LocalDateTime) -> Unit,
     onCloseClick: () -> Unit
 ) {
     val mContext = LocalContext.current
     val sharedPreferences = mContext.getSharedPreferences("shared", Context.MODE_PRIVATE)
 
     val displayTimeFormat = SimpleDateFormat("d")
+    val sdf = SimpleDateFormat("dd.MM.yyyy")
+    val timeF = SimpleDateFormat("yyyy-MM-dd")
+
     var displayTime by rememberSaveable { mutableStateOf("") }
+    var date: Date = Date()
+    var time: LocalDateTime
     var selectedTime by rememberSaveable { mutableStateOf("") }
 
     val calendar = Calendar.getInstance()
@@ -92,9 +101,7 @@ fun TimeSelectBottomSheet(
     val datePickerDialog = DatePickerDialog(
         mContext,
         { _, year: Int, month: Int, day: Int ->
-            val sdf = SimpleDateFormat("dd.MM.yyy")
-            val sTime = sdf.parse("$day.$month.$year")
-
+            date = sdf.parse("$day.$month.$year")
             var displayMonth = ""
 
             when(month) {
@@ -113,9 +120,9 @@ fun TimeSelectBottomSheet(
             }
 
             if (LocalDateTime.now().dayOfMonth == day) {
-                displayTime = "Сегодня, ${displayTimeFormat.format(sTime)} $displayMonth"
+                displayTime = "Сегодня, ${displayTimeFormat.format(date)} $displayMonth"
             } else {
-                displayTime = "${displayTimeFormat.format(sTime)} $displayMonth"
+                displayTime = "${displayTimeFormat.format(date)} $displayMonth"
             }
         }, mYear, mMonth, mDay
     )
@@ -202,6 +209,9 @@ fun TimeSelectBottomSheet(
             label = "Подтвердить",
             onClick = {
                 onTimeChange("$displayTime $selectedTime")
+                Log.d(TAG, "TimeSelectBottomSheet: ${LocalTime.parse(selectedTime).toString()}")
+                time = LocalDateTime.of(LocalDate.parse(timeF.format(date)), LocalTime.parse(selectedTime))
+                onDateTimeChange(time)
             }
         )
     }
@@ -233,7 +243,6 @@ private fun TimeChip(
             text = time,
             color = if (selected) Color.White else descriptionColor,
             fontSize = 16.sp,
-            fontWeight = FontWeight.Medium
         )
     }
 }
