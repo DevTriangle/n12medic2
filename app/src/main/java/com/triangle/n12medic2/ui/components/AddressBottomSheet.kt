@@ -136,15 +136,17 @@ fun AddressBottomSheet(
     
     var isSave by rememberSaveable { mutableStateOf(false) }
 
-    if (address != null) {
-        addressValue = address.address
-        lon = address.lat
-        lat = address.lon
-        alt = address.alt
-        flat = address.flat
-        entrace = address.entrance
-        floor = address.floor
-        doorphone = address.doorphone
+    LaunchedEffect(Unit) {
+        if (address != null) {
+            addressValue = address.address
+            lon = address.lat
+            lat = address.lon
+            alt = address.alt
+            flat = address.flat
+            entrace = address.entrance
+            floor = address.floor
+            doorphone = address.doorphone
+        }
     }
 >>>>>>> Session-51
 
@@ -560,13 +562,14 @@ fun AddressBottomSheet(
                 .fillMaxWidth(),
             label = "Подтвердить",
             onClick = {
+                val fAddress = "$addressValue кв. $flat"
                 val add = Address(addressName, addressValue, lon, lat, alt, flat, entrace, floor, doorphone)
 
                 if (isSave) {
                    OrderService().saveAddress(sharedPreferences, add)
                 }
 
-                onAddressChange(addressValue)
+                onAddressChange(fAddress)
             }
         )
 >>>>>>> Session-51

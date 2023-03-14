@@ -4,6 +4,8 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
 
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -18,7 +20,8 @@
             android:name=".view.PayActivity"
             android:exported="false"
             android:label="@string/title_activity_pay"
-            android:theme="@style/Theme.N12medic2">
+            android:theme="@style/Theme.N12medic2"
+            android:windowSoftInputMode="adjustResize">
             <meta-data
                 android:name="android.app.lib_name"
                 android:value="" />
@@ -27,7 +30,8 @@
             android:name=".view.OrderActivity"
             android:exported="false"
             android:label="@string/title_activity_order"
-            android:theme="@style/Theme.N12medic2">
+            android:theme="@style/Theme.N12medic2"
+            android:windowSoftInputMode="adjustResize">
             <meta-data
                 android:name="android.app.lib_name"
                 android:value="" />
@@ -36,7 +40,8 @@
             android:name=".view.CartActivity"
             android:exported="false"
             android:label="@string/title_activity_cart"
-            android:theme="@style/Theme.N12medic2">
+            android:theme="@style/Theme.N12medic2"
+            android:windowSoftInputMode="adjustPan">
             <meta-data
                 android:name="android.app.lib_name"
                 android:value="" />

@@ -2,7 +2,11 @@ package com.triangle.n12medic2.common
 
 import android.content.SharedPreferences
 import com.google.gson.Gson
+import com.google.gson.JsonArray
 import com.triangle.n12medic2.model.Address
+import com.triangle.n12medic2.model.CartItem
+import com.triangle.n12medic2.model.Order
+import com.triangle.n12medic2.model.User
 
 // Класс для сохранения и получения данных о заказе
 <<<<<<< HEAD
@@ -37,6 +41,56 @@ class OrderService {
     // Автор: Triangle
     fun loadAddress(sharedPreferences: SharedPreferences): Address? {
         return Gson().fromJson(sharedPreferences.getString("address", null), Address::class.java)
+    }
+<<<<<<< HEAD
+>>>>>>> Session-51
+=======
+
+    // Метод для сохранения заказа
+    // Дата создания: 14.03.2023 13:49
+    // Автор: Triangle
+    fun saveOrder(sharedPreferences: SharedPreferences, order: Order, selectedUsers: MutableList<User>) {
+        val orderJson = Gson().toJson(order)
+        val users = Gson().toJson(selectedUsers)
+
+        with(sharedPreferences.edit()) {
+            putString("order", orderJson)
+            putString("users", users)
+            apply()
+        }
+    }
+
+    // Метод для получения заказа
+    // Дата создания: 14.03.2023 13:49
+    // Автор: Triangle
+    fun loadOrder(sharedPreferences: SharedPreferences): Order? {
+        return Gson().fromJson(sharedPreferences.getString("order", null), Order::class.java)
+    }
+
+    // Метод для получения заказа
+    // Дата создания: 14.03.2023 13:49
+    // Автор: Triangle
+    fun loadOrderPatients(sharedPreferences: SharedPreferences): MutableList<User> {
+        val users: MutableList<User> = ArrayList<User>().toMutableList()
+        val usersJson = Gson().fromJson(sharedPreferences.getString("cart", "[]"), JsonArray::class.java)
+
+        usersJson.forEach {
+            val tUser = it.asJsonObject
+
+            users.add(
+                User(
+                    tUser.get("firstname").asString,
+                    tUser.get("lastname").asString,
+                    tUser.get("middlename").asString,
+                    tUser.get("bith").asString,
+                    tUser.get("pol").asString,
+                    tUser.get("image").asString,
+                    tUser.get("cart") as MutableList<CartItem>
+                )
+            )
+        }
+
+        return users
     }
 >>>>>>> Session-51
 }
